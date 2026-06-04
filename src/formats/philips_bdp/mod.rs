@@ -74,8 +74,7 @@ pub fn extract_philips_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
             println!("Checking if it's also MTK BDP...");
 
             let new_file = File::open(&output_path)?;
-            //DUMB
-            let mtk_ctx: AppContext = AppContext { input: InputTarget::File(new_file), output_dir: app_ctx.output_dir.join("0"), options: app_ctx.options.clone() };
+            let mtk_ctx: AppContext = AppContext { input: InputTarget::File(new_file), output_dir: app_ctx.output_dir.join("0"), options: app_ctx.options.clone(), dry_run: app_ctx.dry_run, quiet: app_ctx.quiet };
 
             if let Some(result) = formats::mtk_bdp::is_mtk_bdp_file(&mtk_ctx)? {
                 println!("- MTK BDP file detected!\n");

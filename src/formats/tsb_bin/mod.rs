@@ -57,7 +57,7 @@ pub fn extract_tsb_bin(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
     let hdr: Header = hdr_rdr.read_be()?;
 
     println!("File info -\nSize: {}\nEntry count: {}\nBuild no.: {}\nEntry address: 0x{:02x}"
-            ,hdr.lenght, hdr.entry_count, hdr.build_no(), hdr.entry_addr);
+            ,hdr.length, hdr.entry_count, hdr.build_no(), hdr.entry_addr);
 
     for (i, entry) in hdr.entries.iter().enumerate() {
         println!("\n({}/{}) - {}, Size: {}, Offset: {}, Load address: 0x{:02x}",

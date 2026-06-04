@@ -35,7 +35,6 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
     }
 
     let mut script_string = String::from_utf8_lossy(&script);
-    //println!("{}", script_string);
     if script_string == "" {
         //try for hisense
         println!("Failed to get script at 0x0, trying 0x1000...");
@@ -153,7 +152,7 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
                 println!("- Decompressing lz4, expected size: {}", lz4_expect_size);
                 out_data = decompress_lz4(&data, lz4_expect_size.try_into().unwrap())?;
             } else if compression == CompressionType::Lzo {
-                println!("- Decompessing LZO..");
+                println!("- Decompressing LZO..");
                 unlzop_to_file(&data, output_path)?;
                 println!("-- Saved file!");
                 i += 1;

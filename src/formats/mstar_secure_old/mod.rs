@@ -51,10 +51,12 @@ pub fn extract_mstar_secure_old(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Resu
 
     //run standard mstar ext into same directory
     let r_out_file = File::open(&output_path)?;
-    let in_ctx: AppContext = AppContext { 
-        input: InputTarget::File(r_out_file), 
-        output_dir: app_ctx.output_dir.clone(), 
-        options: app_ctx.options.clone() 
+    let in_ctx: AppContext = AppContext {
+        input: InputTarget::File(r_out_file),
+        output_dir: app_ctx.output_dir.clone(),
+        options: app_ctx.options.clone(),
+        dry_run: app_ctx.dry_run,
+        quiet: app_ctx.quiet,
     };
 
     //do check just in case and extract

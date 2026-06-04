@@ -68,7 +68,6 @@ pub fn extract_sdboot(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
         let entry_header: SdbootEntryHeader = entry_header_reader.read_be()?;
 
         let offset = file.stream_position()?;
-        //println!("File: {} - Offset: {}, Size: {}", entry_header.name(), offset, entry_header.file_size());
 
         file_list.push( FileEntry { name: entry_header.name(), size: entry_header.file_size(), offset });
         file.seek(SeekFrom::Current(entry_header.file_size() as i64))?;

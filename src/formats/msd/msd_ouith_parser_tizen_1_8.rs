@@ -146,7 +146,7 @@ pub fn parse_blob_1_8(blob: &[u8], print_tree: bool) -> Result<(Vec<MSDItem>, Op
                     if print_tree { println!("      OUPartitionVersionDesc(0x0A) - Size: {}", sub_descriptor.size); };
                     let partition_version_desc: OUPartitionVersionDesc = reader.read_be()?;
                     if print_tree { 
-                        println!("          Name lenght: {}", partition_version_desc.name_len);
+                        println!("          Name length: {}", partition_version_desc.name_len);
                         println!("          Name: {}", partition_version_desc.name());
                         println!("          Version: {}", partition_version_desc.version);
                     };
@@ -240,7 +240,7 @@ pub fn parse_blob_1_8(blob: &[u8], print_tree: bool) -> Result<(Vec<MSDItem>, Op
                     if print_tree { println!("      OUSWImageVersionDesc(0x19) - Size: {}", sub_descriptor.size); };
                     let sw_image_version_desc: OUSWImageVersionDesc = reader.read_be()?;
                     if print_tree { 
-                        println!("          Name lenght: {}", sw_image_version_desc.name_len);
+                        println!("          Name length: {}", sw_image_version_desc.name_len);
                         println!("          Name: {}", sw_image_version_desc.name());
                         println!("          Major ver: {}", sw_image_version_desc.major_ver);
                         println!("          Minor ver: {}", sw_image_version_desc.minor_ver);

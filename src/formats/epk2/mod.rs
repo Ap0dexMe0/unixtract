@@ -10,7 +10,8 @@ use binrw::BinReaderExt;
 use crate::utils::common;
 use crate::utils::global::opt_dump_dec_hdr;
 use crate::keys;
-use crate::formats::epk::{decrypt_aes_ecb_auto, find_key};
+use crate::formats::epk::find_key;
+use crate::utils::aes::decrypt_aes_ecb_auto;
 use include::*;
 
 pub fn is_epk2_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {

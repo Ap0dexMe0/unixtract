@@ -60,18 +60,17 @@ pub fn extract_roku(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
 
                 while image_reader.stream_position()? < size as u64 {
                     let image: AImageHeader = image_reader.read_le()?;
-                    println!("  #{} - Type: {}(0x{:x}), Lenght: {}, encmode: {}", 
-                           i, image.image_type_str(), image.image_type, image.lenght, image.encmode_str());
-                    //println!("{:?}", image);
-                    
-                    let data = 
+                    println!("  #{} - Type: {}(0x{:x}), Length: {}, encmode: {}",
+                           i, image.image_type_str(), image.image_type, image.length, image.encmode_str());
+
+                    let data =
                     if image.data_start_offset == 0 { // "0 if header is part of data"
                         image_reader.seek(SeekFrom::Current(-256))?;    //rewind header
-                        common::read_exact(&mut image_reader, image.lenght as usize)?
+                        common::read_exact(&mut image_reader, image.length as usize)?
 
                     } else {
                         let _skip_data = common::read_exact(&mut image_reader, image.data_start_offset as usize - 256)?;
-                        common::read_exact(&mut image_reader, image.lenght as usize - image.data_start_offset as usize)?
+                        common::read_exact(&mut image_reader, image.length as usize - image.data_start_offset as usize)?
                     };
 
                     let folder_path = Path::new(&app_ctx.output_dir).join(&path);

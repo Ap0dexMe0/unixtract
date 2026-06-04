@@ -1,14 +1,13 @@
 use crate::utils::common;
+use crate::utils::aes::decrypt_aes256_ecb;
 use binrw::BinRead;
-use aes::Aes256;
-use ecb::{Decryptor, cipher::{BlockDecryptMut, KeyInit, generic_array::GenericArray}};
 use crate::keys;
 use rsa::{RsaPublicKey, BigUint};
 
 pub fn try_find_key(sig: &[u8], ciphertext: &[u8]) -> Result<Option<(String, [u8; 32])>, Box<dyn std::error::Error>> {
     let mut result: Option<(String, [u8; 32])> = None;
 
-    for (name, n_hex) in keys::PFLUPG {     
+    for (name, n_hex) in keys::PFLUPG {
         let n = BigUint::from_bytes_be(&hex::decode(n_hex)?);
         let e = BigUint::from_bytes_be(&hex::decode("010001")?);
         let pubkey = RsaPublicKey::new(n, e)?;
@@ -17,17 +16,17 @@ pub fn try_find_key(sig: &[u8], ciphertext: &[u8]) -> Result<Option<(String, [u8
         let dec_int = rsa::hazmat::rsa_encrypt(&pubkey, &sig_int)?;
         let dec_sig = dec_int.to_bytes_le();
 
-        let aes_key = &dec_sig[20..52];
-        let dec_ciphertext = decrypt_aes256_ecb(aes_key.try_into().unwrap(), &ciphertext)?;
-        
-        //needs to start with null-termninated filename string
+        let aes_key: [u8; 32] = dec_sig[20..52].try_into().unwrap();
+        let dec_ciphertext = decrypt_aes256_ecb(&aes_key, &ciphertext)?;
+
+        // Needs to start with null-terminated filename string
         let end = match dec_ciphertext.iter().position(|&b| b == 0) {
             Some(pos) => pos,
-            None => continue,       //there is no 0, continue
+            None => continue,       // There is no 0, continue
         };
         let fname = &dec_ciphertext[..end];
-        if fname.len() > 1 && fname.is_ascii() {       //is ascii filename
-            result = Some((name.to_string(), aes_key.try_into().unwrap()));
+        if fname.len() > 1 && fname.is_ascii() {       // Is ASCII filename
+            result = Some((name.to_string(), aes_key));
             break
         }
     }
@@ -35,31 +34,16 @@ pub fn try_find_key(sig: &[u8], ciphertext: &[u8]) -> Result<Option<(String, [u8
     Ok(result)
 }
 
-
-type Aes256EcbDec = Decryptor<Aes256>;
-
-pub fn decrypt_aes256_ecb(key: [u8; 32], ciphertext: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let mut decryptor = Aes256EcbDec::new(&key.into());
-    let mut buffer = ciphertext.to_vec();
-
-    for chunk in buffer.chunks_exact_mut(16) {
-        let block: &mut [u8; 16] = chunk.try_into()?;
-        decryptor.decrypt_block_mut(GenericArray::from_mut_slice(block));
-    }
-    
-    Ok(buffer)
-}
-
 #[derive(BinRead)]
 pub struct Header {
     _magic_bytes: [u8; 8],
     pub header_size: u32,   //data start
     pub data_size: u32,
-	_crc32: u32,
-	pub mask: u32,
-	_data_size_decompressed: u32,
-	_padding2: u32,
-	description_bytes: [u8; 512],
+        _crc32: u32,
+        pub mask: u32,
+        _data_size_decompressed: u32,
+        _padding2: u32,
+        description_bytes: [u8; 512],
 }
 impl Header {
     pub fn description(&self) -> String {
@@ -74,8 +58,8 @@ impl Header {
 pub struct FileHeader {
     file_name_bytes: [u8; 60],
     pub real_size: u32,
-	pub stored_size: u32,
-	pub header_size: u32,
+        pub stored_size: u32,
+        pub header_size: u32,
     pub attributes: [u8; 4],
 }
 impl FileHeader {

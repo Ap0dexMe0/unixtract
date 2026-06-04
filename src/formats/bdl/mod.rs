@@ -33,7 +33,6 @@ pub fn extract_bdl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
 
     for _i in 0..header.pkg_count {
         let pkg_entry: PkgListEntry = file.read_le()?;
-        //println!("Package {} - Offset: {}, Size: {}", i + 1, pkg_entry.offset, pkg_entry.size);
         pkgs.push(pkg_entry);
     }
 

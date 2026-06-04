@@ -125,7 +125,7 @@ pub fn parse_ouith_blob(blob: &[u8], print_tree: bool) -> Result<(Vec<MSDItem>, 
             if print_tree { println!("      Type descriptor(0x{:02x}) - Size: {}", type_descriptor.tag, type_descriptor.size); };
             let destination_info: CommonDestinationInfo = reader.read_be()?;
             if print_tree { 
-                println!("          Name lenght: {}", destination_info.name_len);
+                println!("          Name length: {}", destination_info.name_len);
                 println!("          Name: {}", destination_info.name());
                 println!("          Version: {}", destination_info.version);
             };
@@ -236,7 +236,7 @@ pub fn parse_ouith_blob(blob: &[u8], print_tree: bool) -> Result<(Vec<MSDItem>, 
                 if print_tree { println!("  OUSWImageVersionExDesc(0x12) - Size: {}", version_descriptor.size); };
                 let sw_image_version_ex_desc: OUSWImageVersionExDesc = reader.read_be()?;
                 if print_tree { 
-                    println!("      Name lenght: {}", sw_image_version_ex_desc.name_len);
+                    println!("      Name length: {}", sw_image_version_ex_desc.name_len);
                     println!("      Name: {}", sw_image_version_ex_desc.name());
                     println!("      Major version: {}", sw_image_version_ex_desc.major_ver);
                     println!("      Minor version: {}", sw_image_version_ex_desc.minor_ver);

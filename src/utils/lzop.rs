@@ -50,7 +50,6 @@ pub fn unlzop_to_file(data: &[u8], file_path: PathBuf) -> Result<(), Box<dyn std
         if segment_header.compressed_size > segment_header.uncompressed_size {
             println!("{:?}", segment_header);
         }
-        //println!("{:?}", segment_header);
         if segment_header.uncompressed_size == 0 {
             break
         }

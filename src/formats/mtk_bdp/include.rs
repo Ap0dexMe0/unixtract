@@ -10,7 +10,7 @@ pub static PITIT_END_MARKER: u32 = 0x69_54_49_50; //PITi - end marker of PITIT
 
 #[derive(BinRead)]
 pub struct PITITPITEntry {
-	pub nand_size: u32,
+        pub nand_size: u32,
     pub pit_offset: u32,
     pub pit_size: u32,
     _table_id: u32,
@@ -18,7 +18,7 @@ pub struct PITITPITEntry {
 
 #[derive(BinRead)]
 pub struct PITITBITEntry {
-	pub bit_offset: u32,
+        pub bit_offset: u32,
     pub bit_size: u32,
     _private_data_1: u32,
     _private_data_2: u32,
@@ -29,7 +29,7 @@ pub struct PITHeader {
     pub pit_magic: [u8; 8],
     _version: u32,
     pub first_entry_offset: u32, //"header len"
-    pub entry_size: u32, //"item lenght"
+    pub entry_size: u32, //"item length"
     pub entry_count: u32, //"item num"
 }
 

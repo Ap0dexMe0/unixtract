@@ -1,21 +1,51 @@
+mod error;
 mod formats;
 mod keys;
 mod utils;
 
 use clap::Parser;
-use std::path::{PathBuf};
+use std::path::PathBuf;
 use std::io::{self, Seek, SeekFrom};
 use std::fs::{self, File};
 use crate::formats::{Format, get_registry};
+use crate::error::UnixtractError;
 
 #[derive(Parser, Debug)]
+#[command(
+    name = "unixtract",
+    version,
+    about = "Firmware extractor for various file formats",
+    long_about = "unixtract analyzes and extracts firmware package formats commonly found \
+                  in TVs, Blu-Ray players, and AV devices. It supports 35+ different formats \
+                  with built-in decryption and decompression capabilities."
+)]
 struct Args {
-    input_target: String,
+/// The target file or directory to analyze/extract
+    #[arg(required_unless_present = "list-formats")]
+    input_target: Option<String>,
+
+    /// Folder to save extracted files to (default: _<INPUT_TARGET>)
     output_directory: Option<String>,
 
-    ///format specific options
+    /// Format-specific or global options (can be used multiple times)
     #[arg(short, long)]
     options: Vec<String>,
+
+    /// List supported formats and exit
+    #[arg(long)]
+    list_formats: bool,
+
+    /// Only detect the format, do not extract
+    #[arg(long)]
+    dry_run: bool,
+
+    /// Quiet mode — suppress non-error output
+    #[arg(short, long)]
+    quiet: bool,
+
+    /// Verbose mode — show detailed progress information
+    #[arg(short, long, action = clap::ArgAction::Count)]
+    verbose: u8,
 }
 
 pub enum InputTarget {
@@ -27,7 +57,10 @@ pub struct AppContext {
     pub input: InputTarget,
     pub output_dir: PathBuf,
     pub options: Vec<String>,
+    pub dry_run: bool,
+    pub quiet: bool,
 }
+
 impl AppContext {
     pub fn file(&self) -> Option<&File> {
         match &self.input {
@@ -49,32 +82,63 @@ impl AppContext {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("unixtract Firmware extractor");
     let args = Args::parse();
 
-    let target_path_str = args.input_target;
-    println!("Input target: {}", target_path_str);
-    let target_path = PathBuf::from(&target_path_str);
-    
-    let output_path_str = if args.output_directory.is_some() {
-        args.output_directory.unwrap()
+    // Initialize logger based on verbosity level
+    let log_level = if args.quiet {
+        "error"
     } else {
-        format!("_{}", target_path.file_name().and_then(|s| s.to_str()).unwrap())
+        match args.verbose {
+            0 => "warn",
+            1 => "info",
+            2 => "debug",
+            _ => "trace",
+        }
     };
-    println!("Output directory: {}", output_path_str);
+
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level))
+        .format_timestamp(None)
+        .init();
+
+    // Handle --list-formats
+    if args.list_formats {
+        let formats = get_registry();
+        println!("Supported formats ({} total):", formats.len());
+        for (i, fmt) in formats.iter().enumerate() {
+            println!("  {:2}. {}", i + 1, fmt.name);
+        }
+        return Ok(());
+    }
+
+    log::info!("unixtract Firmware extractor v{}", env!("CARGO_PKG_VERSION"));
+
+    let target_path_str = args.input_target.as_deref().unwrap_or("");
+    log::info!("Input target: {}", target_path_str);
+    let target_path = PathBuf::from(target_path_str);
+
+    let output_path_str = if let Some(ref out) = args.output_directory {
+        out.clone()
+    } else {
+        format!("_{}", target_path.file_name()
+            .and_then(|s| s.to_str())
+            .ok_or_else(|| UnixtractError::Other("Invalid input file name".to_string()))?)
+    };
+    log::info!("Output directory: {}", output_path_str);
     let output_directory_path = PathBuf::from(&output_path_str);
 
     if output_directory_path.exists() {
         if output_directory_path.is_dir() {
             let is_empty = fs::read_dir(&output_directory_path)?.next().is_none();
-            if !is_empty {
-                println!("\nWarning: Output folder already exists and is NOT empty! Files may be overwritten!");
-                println!("Press Enter if you want to continue...");
+            if !is_empty && !args.quiet {
+                log::warn!("Output folder already exists and is NOT empty! Files may be overwritten.");
+                eprintln!("Warning: Output folder already exists and is NOT empty! Files may be overwritten!");
+                eprintln!("Press Enter if you want to continue...");
                 io::stdin().read_line(&mut String::new())?;
             }
         }
     }
 
+    // === DEFAULT MODE (original behavior) ===
     let app_ctx;
 
     if target_path.is_file() {
@@ -83,37 +147,55 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             input: InputTarget::File(file),
             output_dir: output_directory_path,
             options: args.options,
+            dry_run: args.dry_run,
+            quiet: args.quiet,
         };
     } else if target_path.is_dir() {
         app_ctx = AppContext {
             input: InputTarget::Directory(target_path),
             output_dir: output_directory_path,
             options: args.options,
+            dry_run: args.dry_run,
+            quiet: args.quiet,
         };
     } else {
         return Err("Invalid input path!".into());
     }
 
     let formats: Vec<Format> = get_registry();
-    println!("Loaded {} formats!", formats.len());
+    log::info!("Loaded {} formats", formats.len());
 
     for format in formats {
         if let Some(ctx) = (format.detector_func)(&app_ctx)? {
-            println!("\n{} detected!", format.name);
+            log::info!("{} detected!", format.name);
+            if !app_ctx.quiet {
+                println!("\n{} detected!", format.name);
+            }
 
-            //reset seek of the file if present
+            if app_ctx.dry_run {
+                if !app_ctx.quiet {
+                    println!("Dry run — skipping extraction.");
+                }
+                return Ok(());
+            }
+
+            // Reset seek of the file if present
             if let Some(mut file) = app_ctx.file() {
                 file.seek(SeekFrom::Start(0))?;
             }
 
             (format.extractor_func)(&app_ctx, ctx)?;
 
-            //extractor returned with no error
-            println!("\nExtraction finished! Saved extracted files to {}", output_path_str);
+            // Extractor returned with no error
+            if !app_ctx.quiet {
+                println!("\nExtraction finished! Saved extracted files to {}", output_path_str);
+            }
             return Ok(());
         }
     }
 
-    println!("\nInput format not recognized!");
-    Ok(())
+    if !app_ctx.quiet {
+        println!("\nInput format not recognized!");
+    }
+    Err("Unrecognized input format".into())
 }

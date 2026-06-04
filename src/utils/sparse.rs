@@ -44,7 +44,7 @@ pub fn unsparse_to_file(data: &[u8], file_path: PathBuf) -> Result<(), Box<dyn s
 
         } else if chunk_header.chunk_type == 0xCAC2 { // "fill" type chunk (fill size with a value)
             if chunk_data.len() != 4 {
-                return Err("Inavlid lenght of FILL chunk!".into());
+                return Err("Invalid length of FILL chunk!".into());
             }
             let fill_size = (chunk_header.chunk_size * file_header.block_size) / 4;
             let fill_data = chunk_data.repeat(fill_size as usize);

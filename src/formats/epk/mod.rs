@@ -3,6 +3,7 @@ use std::io::Seek;
 use crate::AppContext;
 
 use crate::utils::common;
+use crate::utils::aes::decrypt_aes_ecb_auto;
 use crate::formats;
 
 pub struct EpkContext {
@@ -29,13 +30,13 @@ fn check_epk_version(versions: &[u8]) -> Option<u8> {
 
     if match_with_pattern(&versions, epk2_pattern) {
         Some(2)
-    } else if match_with_pattern(&versions, epk3_pattern) {     
+    } else if match_with_pattern(&versions, epk3_pattern) {
         Some(3)
-    } else if match_with_pattern(&versions, epk3_another_pattern) {     
+    } else if match_with_pattern(&versions, epk3_another_pattern) {
         Some(3)
-    } else if match_with_pattern(&versions, epk3_new_pattern) {     
+    } else if match_with_pattern(&versions, epk3_new_pattern) {
         Some(3)
-    }else {
+    } else {
         None
     }
 }
@@ -61,7 +62,7 @@ pub fn extract_epk(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
     let platform_version = common::string_from_bytes(&versions[4..20]);
     let sdk_version = common::string_from_bytes(&versions[20..36]);
     println!("Platform version: {}\nSDK version: {}", platform_version, sdk_version);
-    
+
     file.seek(std::io::SeekFrom::Start(0))?;
 
     if ctx.epk_version == 2 {
@@ -75,7 +76,11 @@ pub fn extract_epk(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
     Ok(())
 }
 
-//COMMON EPK FUNCTIONS
+// COMMON EPK FUNCTIONS
+
+/// Try each key in `key_array` to find one that decrypts `data` with a header
+/// matching `expected_magic`. Returns the key name and the raw key bytes on
+/// success, or `None` if no key works.
 pub fn find_key<'a>(key_array: &'a [(&'a str, &'a str)], data: &[u8], expected_magic: &[u8]) -> Result<Option<(&'a str, Vec<u8>)>, Box<dyn std::error::Error>> {
     for (key_hex, name) in key_array {
         let key_bytes = hex::decode(key_hex)?;
@@ -83,41 +88,10 @@ pub fn find_key<'a>(key_array: &'a [(&'a str, &'a str)], data: &[u8], expected_m
             Ok(d) => d,
             Err(_) => continue,
         };
-     
+
         if decrypted.starts_with(expected_magic) {
             return Ok(Some((name, key_bytes)));
         }
     }
     Ok(None)
-}
-
-use aes::Aes128;
-use aes::Aes256;
-use ecb::{Decryptor, cipher::{BlockDecryptMut, KeyInit, generic_array::GenericArray}};
-
-type Aes128EcbDec = Decryptor<Aes128>;
-type Aes256EcbDec = Decryptor<Aes256>;
-
-pub fn decrypt_aes_ecb_auto(key: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
-    let mut buffer = ciphertext.to_vec();
-
-    if key.len() == 32 {
-        // aes256
-        let key_array: [u8; 32] = key.try_into()?;
-        let mut decryptor = Aes256EcbDec::new(&key_array.into());
-        for chunk in buffer.chunks_exact_mut(16) {
-            let block: &mut [u8; 16] = chunk.try_into()?;
-            decryptor.decrypt_block_mut(GenericArray::from_mut_slice(block));
-        }
-    } else {
-        // aes128
-        let key_array: [u8; 16] = key.try_into()?;
-        let mut decryptor = Aes128EcbDec::new(&key_array.into());
-        for chunk in buffer.chunks_exact_mut(16) {
-            let block: &mut [u8; 16] = chunk.try_into()?;
-            decryptor.decrypt_block_mut(GenericArray::from_mut_slice(block));
-        }
-    }
-
-    Ok(buffer)
 }

@@ -1,6 +1,23 @@
+//! Format registry and detection/extraction framework.
+//!
+//! Each supported firmware format has a detector function (`is_*_file`) that
+//! checks whether a given input matches that format, and an extractor function
+//! (`extract_*`) that performs the actual extraction. The [`Format`] struct
+//! pairs these together, and [`get_registry`] returns the ordered list of all
+//! supported formats.
+//!
+//! **Important**: The order of formats in the registry matters. Some formats
+//! can contain other formats as inner payloads, so the outer format must be
+//! detected first. Ordering constraints are noted in comments.
+
 use std::any::Any;
 use crate::AppContext;
 
+/// A supported firmware format with its detector and extractor functions.
+///
+/// The `detector_func` returns `Some(ctx)` if the input matches this format,
+/// where `ctx` is an opaque box of format-specific context data that will be
+/// passed to the `extractor_func`. Returns `None` if the format doesn't match.
 pub struct Format {
     pub name: &'static str,
     pub detector_func: fn(&AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>>,
@@ -35,10 +52,10 @@ pub mod gx_dvb;
 pub mod onkyo;
 pub mod philips_bdp;
 pub mod tsb_bin;
+    pub mod pup;
+    pub mod vestel;
 
-pub mod pup;
-
-pub mod msd;
+    pub mod msd;
 pub mod msd10;
 pub mod msd11;
 
@@ -53,7 +70,11 @@ pub mod mtk_pkg_old;
 pub mod mtk_pkg_new;
 pub mod mtk_bdp;
 
-//define all formats here
+/// Returns the ordered list of all supported firmware formats.
+///
+/// Formats are tried in order during detection; the first match wins. This
+/// means that container formats (which embed other formats) must appear
+/// before their inner formats to avoid misdetection.
 pub fn get_registry() -> Vec<Format> {
     return vec![
         Format {
@@ -256,5 +277,9 @@ pub fn get_registry() -> Vec<Format> {
             detector_func: crate::formats::tsb_bin::is_tsb_bin_file,
             extractor_func: crate::formats::tsb_bin::extract_tsb_bin,
         },   
-    ]
+        Format {
+            name: "vestel",
+            detector_func: crate::formats::vestel::is_vestel_file,
+            extractor_func: crate::formats::vestel::extract_vestel,
+        },    ]
 }

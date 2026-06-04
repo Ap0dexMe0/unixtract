@@ -168,3 +168,8 @@ pub static EPK: &[(&str, &str)] = &[
     ("1FB2C3B789D5EA48ED16E79A0343986C691DACEC872BB07787D0F722AF5D1E2C", "lm21ann - MStar webOS 8 (2023)"),
 
 ];
+
+//Vestel keys
+pub static VESTEL: &[(&str, &str)] = &[
+    ("VESTEL-MB180/MB130/MB181", "12345678123456781234567812345678"),
+];

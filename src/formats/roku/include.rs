@@ -19,8 +19,8 @@ pub struct AImageHeader {
     _release_id: u32,                   // toplevel build / release version
     _platform_id: u32,                  // target platform information
     pub image_type: u32,                // image type
-    pub lenght: u32,                    // length of entire image (header + data + trailing padding) 
-    _data_lenght: u32,                  // length of image data (ie from data_start_offset to start of trailing padding)
+    pub length: u32,                    // length of entire image (header + data + trailing padding) 
+    _data_length: u32,                  // length of image data (ie from data_start_offset to start of trailing padding)
     pub data_start_offset: u32,         // 0 if header is part of data, sizeof(aimage_v1_header_t) if header is prepended to data
     _data_link_address: u32,            // for non-pic executable images, where should the image placed in memory in order to execute
     _data_entry_point_offset: u32,      // 0 if execution entry point is at the beginning of image data

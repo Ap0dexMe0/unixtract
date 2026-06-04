@@ -213,12 +213,11 @@ fn unhuff(data: &[u8]) -> Vec<u8> {
 
             let found_j: i32;
             loop {
-                if !get_byte(&mut ctx, &mut in_cur) {	
-					//println!("retA");
-					//flush
-					if ctx.code_buf_ptr > 1 { for j in 0..ctx.code_buf_ptr { out.push(ctx.code_buf[j]); } };
-					return out;
-				}
+                if !get_byte(&mut ctx, &mut in_cur) {
+                                        // flush
+                                        if ctx.code_buf_ptr > 1 { for j in 0..ctx.code_buf_ptr { out.push(ctx.code_buf[j]); } };
+                                        return out;
+                                }
                 if ctx.len < 2 { continue; }
                 let keyp = (((ctx.len & 0x7) as usize) << 6) | ((ctx.code & 0x3F) as usize);
                 let mut jdx = lookup_charpos[keyp];
@@ -235,16 +234,15 @@ fn unhuff(data: &[u8]) -> Vec<u8> {
                 found_j = jdx as i32;
                 let b = ((jdx as i32) >> 1) as u8;
                 if ctx.code_buf_ptr < ctx.code_buf.len() { ctx.code_buf[ctx.code_buf_ptr] = b; ctx.code_buf_ptr += 1; }
-				break;
+                                break;
             }
             ctx.code = 0;
             for _ in 0..7 { if !get_byte(&mut ctx, &mut in_cur) {
-				//println!("retB");
-				//flush
-				if ctx.code_buf_ptr > 1 { for j in 0..ctx.code_buf_ptr { out.push(ctx.code_buf[j]); } };
-				return out;
-				}
-			}
+                                // flush
+                                if ctx.code_buf_ptr > 1 { for j in 0..ctx.code_buf_ptr { out.push(ctx.code_buf[j]); } };
+                                return out;
+                                }
+                        }
             let combined = (ctx.code | ((found_j as u32) << 7)) as u32;
             if ctx.code_buf_ptr < ctx.code_buf.len() { ctx.code_buf[ctx.code_buf_ptr] = (combined & 0xFF) as u8; ctx.code_buf_ptr += 1; }
             ctx.code = 0; ctx.len = 0;

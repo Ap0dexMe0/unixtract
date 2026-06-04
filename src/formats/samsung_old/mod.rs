@@ -100,10 +100,8 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
                         iv.extend_from_slice(&key_md5.0);
                         iv.extend_from_slice(&key);
                         iv_md5 = md5::compute(&iv);
-                    }     
+                    }
 
-                    //println!("Key: {:02x?}", key_md5);
-                    //println!("IV: {:02x?}", iv_md5);
                     let end = file_size - 260;
                     println!("- Decrypting file...");
                     let decrypted_data = decrypt_aes128_cbc_pcks7(&data[16..end.try_into().unwrap()], &key_md5, &iv_md5)?;

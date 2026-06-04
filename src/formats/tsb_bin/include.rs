@@ -5,7 +5,7 @@ use binrw::BinRead;
 pub struct Header {
     _signature: [u8; 128],
     _control_id: u32,               //must be zero
-    pub lenght: u32,                //file size
+    pub length: u32,                //file size
     pub entry_count: u32,
     _pad1: [u8; 4],
     build_no_bytes: [u8; 16],

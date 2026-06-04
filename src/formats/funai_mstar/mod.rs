@@ -67,10 +67,12 @@ pub fn extract_funai_mstar(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
         //extract SoC which (should be) mstar_secure_old, this is just a simple container for that format ( so we will go funai_mstar -> mstar_secure_old -> mstar (DUMB?) )
         if name == "SoC" {
             let r_out_file = File::open(&output_path)?;
-            let in_ctx: AppContext = AppContext { 
-                input: InputTarget::File(r_out_file), 
-                output_dir: app_ctx.output_dir.join("SoC"), 
-                options: app_ctx.options.clone() 
+            let in_ctx: AppContext = AppContext {
+                input: InputTarget::File(r_out_file),
+                output_dir: app_ctx.output_dir.join("SoC"),
+                options: app_ctx.options.clone(),
+                dry_run: app_ctx.dry_run,
+                quiet: app_ctx.quiet,
             };
 
             //do check and extarct

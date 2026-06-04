@@ -8,6 +8,7 @@ use std::fs::{self, File, OpenOptions};
 use binrw::BinReaderExt;
 
 use crate::utils::common;
+use crate::utils::aes::decrypt_aes256_ecb;
 use include::*;
 
 pub fn is_pfl_upg_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
@@ -58,7 +59,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         let encrypted_data = common::read_exact(&mut file, (header.data_size as usize + 0xf) & !0xf)?;
 
         println!("Decrypting data...");
-        data = decrypt_aes256_ecb(aes_key, &encrypted_data)?;
+        data = decrypt_aes256_ecb(&aes_key, &encrypted_data)?;
         data.truncate(header.data_size as usize);   //discard padding 
         
     } else {
@@ -108,10 +109,12 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
 
             //REOPEN temp file and make ctx
             let r_temp_file = File::open(&temp_path)?;
-            let in_ctx: AppContext = AppContext { 
-                input: InputTarget::File(r_temp_file), 
-                output_dir: output_path, 
-                options: app_ctx.options.clone() 
+            let in_ctx: AppContext = AppContext {
+                input: InputTarget::File(r_temp_file),
+                output_dir: output_path,
+                options: app_ctx.options.clone(),
+                dry_run: app_ctx.dry_run,
+                quiet: app_ctx.quiet,
             };
 
             //do check just in case and extract

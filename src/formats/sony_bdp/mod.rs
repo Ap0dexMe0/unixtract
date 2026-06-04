@@ -113,10 +113,12 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
         let last_file = File::open(last_file_path.unwrap())?;
         let mtk_extraction_path = app_ctx.output_dir.join(format!("{}", i));
 
-        let ctx: AppContext = AppContext { 
-            input: InputTarget::File(last_file), 
+        let ctx: AppContext = AppContext {
+            input: InputTarget::File(last_file),
             output_dir: mtk_extraction_path,
-            options: app_ctx.options.clone() 
+            options: app_ctx.options.clone(),
+            dry_run: app_ctx.dry_run,
+            quiet: app_ctx.quiet,
         };
 
         if let Some(result) = formats::mtk_bdp::is_mtk_bdp_file(&ctx)? {

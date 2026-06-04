@@ -171,5 +171,5 @@ pub static EPK: &[(&str, &str)] = &[
 
 //Vestel keys
 pub static VESTEL: &[(&str, &str)] = &[
-    ("VESTEL-MB180/MB130/MB181", "12345678123456781234567812345678"),
+    ("VESTEL-MB180/MB130/MB181/MB230/MB211/MB281", "12345678123456781234567812345678"),
 ];

@@ -9,6 +9,16 @@ use crate::keys;
 
 use include::*;
 
+pub struct VestelCtx {
+    pub is_encrypted: bool,
+    pub variant: VestelVariant,
+}
+
+pub enum VestelVariant {
+    Standard,
+    Mb230,
+}
+
 pub fn is_vestel_file(
     app_ctx: &AppContext,
 ) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
@@ -19,16 +29,25 @@ pub fn is_vestel_file(
 
     let file_size = file.metadata()?.len() as usize;
 
-    // 1. FAST PATH: plaintext check
     let header = common::read_file(&file, 0, 64)?;
 
     if header.windows(5).any(|w| w == b"OPTEE") {
         return Ok(Some(Box::new(VestelCtx {
             is_encrypted: false,
+            variant: VestelVariant::Standard,
         })));
     }
 
-    // 2. KEY CHECK
+    if header.starts_with(b"\xaa\xaa\x55\x55\x55\x55\xaa\xaa") {
+        let magic_str = &header[0x10..0x14];
+        if magic_str == b"spi\x00" {
+            return Ok(Some(Box::new(VestelCtx {
+                is_encrypted: false,
+                variant: VestelVariant::Mb230,
+            })));
+        }
+    }
+
     let (_, key_hex) = match keys::VESTEL.first() {
         Some(k) => k,
         None => return Ok(None),
@@ -44,28 +63,24 @@ pub fn is_vestel_file(
         Err(_) => return Ok(None),
     };
 
-    // 3. SIZE CHECK
     if file_size < 32 {
         return Ok(None);
     }
 
-    // 4. Read file
     let data = common::read_exact(&mut file, file_size)?;
 
-    // 5. Python equivalent trimming
     let cut_len = data.len().saturating_sub(16) & !0xF;
 
     if cut_len == 0 {
         return Ok(None);
     }
 
-    // 6. decrypt candidate
     let decrypted = decrypt_aes128_ecb(&key, &data[..cut_len])?;
 
-    // 7. verify OPTEE in decrypted output
     if decrypted.windows(5).any(|w| w == b"OPTEE") {
         return Ok(Some(Box::new(VestelCtx {
             is_encrypted: true,
+            variant: VestelVariant::Standard,
         })));
     }
 
@@ -76,8 +91,19 @@ pub fn extract_vestel(
     app_ctx: &AppContext,
     ctx: Box<dyn Any>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let mut file = app_ctx.file().ok_or("Extractor expected file")?;
     let ctx = ctx.downcast::<VestelCtx>().expect("Missing context");
+
+    match ctx.variant {
+        VestelVariant::Mb230 => extract_mb230(app_ctx, &ctx),
+        VestelVariant::Standard => extract_standard(app_ctx, &ctx),
+    }
+}
+
+fn extract_standard(
+    app_ctx: &AppContext,
+    ctx: &VestelCtx,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = app_ctx.file().ok_or("Extractor expected file")?;
 
     let file_size = file.metadata()?.len() as usize;
     let data = common::read_exact(&mut file, file_size)?;
@@ -89,7 +115,6 @@ pub fn extract_vestel(
     let key_vec = hex::decode(key_hex)?;
     let key: [u8; 16] = key_vec.try_into().map_err(|_| "Invalid AES key length")?;
 
-    // decrypt if needed
     let (final_data, decrypted_path) = if ctx.is_encrypted {
         println!("Encrypted Vestel firmware detected");
         println!("Using key: {} ({})", "VESTEL", key_hex);
@@ -138,11 +163,55 @@ pub fn extract_vestel(
         println!("- Saved {}.bin", name);
     }
 
-    // cleanup decrypted temp file if not needed
     if let Some(path) = decrypted_path {
         if !app_ctx.has_option("vestel:keep_decrypted") {
             let _ = fs::remove_file(path);
         }
+    }
+
+    Ok(())
+}
+
+fn extract_mb230(
+    app_ctx: &AppContext,
+    _ctx: &VestelCtx,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = app_ctx.file().ok_or("Extractor expected file")?;
+
+    let file_size = file.metadata()?.len() as usize;
+    let data = common::read_exact(&mut file, file_size)?;
+
+    println!("Detected Vestel MB230 firmware (Novatek NT72673)");
+    println!("File size: {} bytes ({:.2} MB)", file_size, file_size as f64 / 1024.0 / 1024.0);
+
+    let partitions = MB230_PARTITIONS;
+    println!("\nPartition count: {}", partitions.len());
+
+    fs::create_dir_all(&app_ctx.output_dir)?;
+
+    for (name, (offset, size)) in partitions.iter() {
+        let start = *offset;
+        let end = start.saturating_add(*size);
+
+        if start >= file_size {
+            println!("Skipping {} (out of range)", name);
+            continue;
+        }
+
+        let end = end.min(file_size);
+        let segment = &data[start..end];
+
+        println!(
+            "\n{} - Offset: 0x{:X}, Size: 0x{:X} ({} bytes)",
+            name, offset, size, segment.len()
+        );
+
+        let output_path = std::path::Path::new(&app_ctx.output_dir)
+            .join(format!("{}.bin", name));
+
+        fs::write(&output_path, segment)?;
+
+        println!("- Saved {}.bin", name);
     }
 
     Ok(())

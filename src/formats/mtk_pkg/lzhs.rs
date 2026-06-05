@@ -1,3 +1,4 @@
+use log::info;
 use std::fs::OpenOptions;
 use std::io::{Write, Cursor, Seek, SeekFrom, Read};
 use binrw::{BinRead, BinReaderExt};
@@ -39,7 +40,7 @@ pub fn decompress_mtk_to_file(data: &[u8], output_file: &PathBuf) -> Result<(), 
         let segment_header: LzhsHeader = data_reader.read_le()?;
         let comp_header: LzhsHeader = data_reader.read_le()?;
 
-        println!("[cmp] Segment {} - Compressed size: {}, Decompressed size: {}",
+        info!("[cmp] Segment {} - Compressed size: {}, Decompressed size: {}",
                 segment_header.checksum_or_seg_idx, comp_header.compressed_size, comp_header.uncompressed_size);
 
         let compressed_data = common::read_exact(&mut data_reader, comp_header.compressed_size as usize)?;
@@ -71,7 +72,7 @@ pub fn decompress_mtk_to_file(data: &[u8], output_file: &PathBuf) -> Result<(), 
 
         } else {
             //normal variant
-            println!("- Decompressing {:?}...", compression_type);
+            info!("- Decompressing {:?}...", compression_type);
             if compression_type == CompressionType::LZ4 {
                 out_data = decompress_lz4(&compressed_data, comp_header.uncompressed_size as i32)?;
             }
@@ -84,12 +85,12 @@ pub fn decompress_mtk_to_file(data: &[u8], output_file: &PathBuf) -> Result<(), 
                 arm_thumb_convert(&mut out_data, 0, false);
 
                 let checksum = calc_checksum(&out_data);
-                println!("-- Calculated checksum: 0x{:02x?}", checksum);
+                info!("-- Calculated checksum: 0x{:02x?}", checksum);
                 if u32::from(checksum) != comp_header.checksum_or_seg_idx {
-                    println!("--- Checksum mismatch! Expected: 0x{:02x?}, Got: 0x{:02x?}!", comp_header.checksum_or_seg_idx, checksum);
+                    info!("--- Checksum mismatch! Expected: 0x{:02x?}, Got: 0x{:02x?}!", comp_header.checksum_or_seg_idx, checksum);
                     return Err("LZHS checksum mismatch".into());
                 } else {
-                    println!("--- Checksum OK!")
+                    info!("--- Checksum OK!")
                 }
             }
             else {
@@ -119,7 +120,7 @@ pub fn decompress_mtk_to_file_old(data: &[u8], output_file: &PathBuf) -> Result<
         let _segment_header: LzhsOldSegmentHdr = data_reader.read_le()?;
         let lzhs_header: LzhsHeader = data_reader.read_le()?;
 
-        println!("[LZHS] Segment - Compressed size: {}, Decompressed size: {}, Expected Checksum: 0x{:02x?}",
+        info!("[LZHS] Segment - Compressed size: {}, Decompressed size: {}, Expected Checksum: 0x{:02x?}",
                 lzhs_header.compressed_size, lzhs_header.uncompressed_size, lzhs_header.checksum_or_seg_idx);
 
         let compressed_data = common::read_exact(&mut data_reader, lzhs_header.compressed_size as usize)?;
@@ -129,12 +130,12 @@ pub fn decompress_mtk_to_file_old(data: &[u8], output_file: &PathBuf) -> Result<
         arm_thumb_convert(&mut out_data, 0, false);
 
         let checksum = calc_checksum(&out_data);
-        println!("-- Calculated checksum: 0x{:02x?}", checksum);
+        info!("-- Calculated checksum: 0x{:02x?}", checksum);
         if u32::from(checksum) != lzhs_header.checksum_or_seg_idx {
-            println!("--- Checksum mismatch! Expected: 0x{:02x?}, Got: 0x{:02x?}!", lzhs_header.checksum_or_seg_idx, checksum);
+            info!("--- Checksum mismatch! Expected: 0x{:02x?}, Got: 0x{:02x?}!", lzhs_header.checksum_or_seg_idx, checksum);
             return Err("LZHS checksum mismatch".into());
         } else {
-            println!("--- Checksum OK!")
+            info!("--- Checksum OK!")
         }
         
         out_file.write_all(&out_data)?;

@@ -10,6 +10,7 @@ use binrw::BinReaderExt;
 use crate::utils::aes::{decrypt_aes128_cbc_pcks7};
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub fn is_invincible_image_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -26,14 +27,14 @@ pub fn extract_invincible_image(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Res
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
 
     let header: Header = file.read_le()?;
-    println!("File info -\nKey ID: {}\nVersion(1): {}\nVersion(2): {}\nVersion(3): {}\nVersion(4): {}\nData size: {}\nChunk count: {}\nChunk size: {}\n\nPayload Count: {}",
+    info!("File info -\nKey ID: {}\nVersion(1): {}\nVersion(2): {}\nVersion(3): {}\nVersion(4): {}\nData size: {}\nChunk count: {}\nChunk size: {}\n\nPayload Count: {}",
             header.file_infos[0], header.ver1(), header.ver2(), header.ver3(), header.ver4(), header.data_size, header.chunk_count, header.chunk_size, header.payload_count);
 
     let mut entries: Vec<Entry> = Vec::new();
 
     for i in 0..header.payload_count {
         let entry: Entry = file.read_le()?;
-        println!("{}. {} - Start offset: {}, Size: {}", 
+        info!("{}. {} - Start offset: {}, Size: {}", 
                 i + 1, entry.name(), entry.start_offset, entry.size);
         entries.push(entry);
     }
@@ -65,13 +66,13 @@ pub fn extract_invincible_image(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Res
         }
     }
 
-    println!("\nDecrypting data...");
+    info!("\nDecrypting data...");
     let decrypted_data = decrypt_aes128_cbc_pcks7(&encrypted_data, &aes_key, &aes_iv)?;
 
     let mut data_reader = Cursor::new(decrypted_data);
 
     for (i , entry) in entries.iter().enumerate() {
-        println!("\n({}/{}) - {}, Size: {}, Start offset: {}", i+1, header.payload_count, entry.name(), entry.size, entry.start_offset);
+        info!("\n({}/{}) - {}, Size: {}, Start offset: {}", i+1, header.payload_count, entry.name(), entry.size, entry.start_offset);
 
         let data = common::read_exact(&mut data_reader, entry.size as usize)?;
 
@@ -82,7 +83,7 @@ pub fn extract_invincible_image(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Res
         out_file.seek(SeekFrom::Start(entry.start_offset.into()))?;
         out_file.write_all(&data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
     }
 
     Ok(())

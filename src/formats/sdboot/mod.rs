@@ -12,10 +12,11 @@ use crate::utils::common;
 use crate::formats::sddl_sec::include::*;
 use crate::utils::compression::decompress_zlib;
 use include::*;
+use log::info;
 
 pub fn is_sdboot_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
-    let header = common::read_file(&file, 0, 32).expect("Failed to read from file.");
+    let header = common::read_file(&file, 0, 32)?;
     let deciph_header = decipher(&header);
 
     let chk = deciph_header.iter().all(|&b| {
@@ -59,7 +60,7 @@ pub fn extract_sdboot(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
     }
     let key: KeyEntry = KeyEntry::AES(KEYS[key_id as usize]);
 
-    println!("File info -\nKey ID: {}\nFile count: {}", secfile_header.key_id(), secfile_header.num_files());
+    info!("File info -\nKey ID: {}\nFile count: {}", secfile_header.key_id(), secfile_header.num_files());
 
     //create file list
     let mut file_list: Vec<FileEntry> = Vec::new();  
@@ -84,7 +85,7 @@ pub fn extract_sdboot(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
         let target = s.next().unwrap();     //"nand"
         let target_filename = s.next().unwrap();    //"nandall.img"
 
-        println!("\nSaving {} to {}...", target, target_filename);
+        info!("\nSaving {} to {}...", target, target_filename);
         let output_path = Path::new(&app_ctx.output_dir).join(&target_filename);
         let mut out_file = OpenOptions::new().write(true).create(true).truncate(true).open(&output_path)?;
 
@@ -95,18 +96,18 @@ pub fn extract_sdboot(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
         let info_header: InfoListHeader = infofile_reader.read_le()?;
         for i in 0..info_header.part_count {
             let part_entry: InfoListEntry = infofile_reader.read_le()?;
-            println!("- ({}/{}) Size: {}, Compressed?: {}", i+1, info_header.part_count, part_entry.out_size, part_entry.is_compressed());
+            info!("- ({}/{}) Size: {}, Compressed?: {}", i+1, info_header.part_count, part_entry.out_size, part_entry.is_compressed());
 
             let part_file_name = format!("{}{:02x}", target_filename, i); //not sure what happens if it goes over 255
             let mut part_data = get_file(&file, &part_file_name, &file_list, &key)?;
 
             if part_entry.is_ciphered() {
-                println!("-- Deciphering...");
+                info!("-- Deciphering...");
                 part_data = decipher(&part_data);
             }
 
             if part_entry.is_compressed() {
-                println!("-- Decompressing...");
+                info!("-- Decompressing...");
                 part_data = decompress_zlib(&part_data)?;
             }
 
@@ -114,7 +115,7 @@ pub fn extract_sdboot(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
             processed_image_files.insert(part_file_name);
         }
 
-        println!("--- Saved file!");
+        info!("--- Saved file!");
     }
 
     //extract the rest of the files
@@ -123,13 +124,13 @@ pub fn extract_sdboot(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
             continue;
         }
 
-        println!("\nFile: {} - Size: {}", entry.name, entry.size);
+        info!("\nFile: {} - Size: {}", entry.name, entry.size);
 
         let file_data = get_file(&file, &entry.name, &file_list, &key)?;
         let output_path = Path::new(&app_ctx.output_dir).join(&entry.name);
         let mut out_file = OpenOptions::new().read(true).write(true).create(true).open(output_path)?;
         out_file.write_all(&file_data)?;
-        println!("- Saved file!");
+        info!("- Saved file!");
     }
 
     Ok(())

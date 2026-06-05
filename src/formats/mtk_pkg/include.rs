@@ -2,8 +2,8 @@ use crate::utils::common;
 use binrw::BinRead;
 
 pub static HEADER_KEY: [u8; 16] = [
-        0x09, 0x29, 0x10, 0x94, 0x09, 0x29, 0x10, 0x94,
-        0x09, 0x29, 0x10, 0x94, 0x09, 0x29, 0x10, 0x94,
+    0x09, 0x29, 0x10, 0x94, 0x09, 0x29, 0x10, 0x94,
+    0x09, 0x29, 0x10, 0x94, 0x09, 0x29, 0x10, 0x94,
 ];
 
 pub static HEADER_IV: [u8; 16] = [0x00; 16];
@@ -24,7 +24,7 @@ pub struct Header {
     pub vendor_magic_bytes: [u8; 4],
     _mtk_magic: [u8; 8], //#DH@FiRm
     version_bytes: [u8; 60],
-	pub file_size: u32,
+    pub file_size: u32,
     _flags: [u8; 4],        // 3rd is possibly the compression type in new mtk pkg
     product_name_bytes: [u8; 32],
 }
@@ -44,7 +44,7 @@ impl Header {
 #[derive(BinRead)]
 pub struct PartEntry {
     name_bytes: [u8; 4],
-	pub flags: u32,
+    pub flags: u32,
     pub size: u32,
 }
 impl PartEntry {

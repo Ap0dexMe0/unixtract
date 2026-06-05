@@ -8,6 +8,7 @@ use binrw::BinReaderExt;
 
 use include::*;
 use crate::utils::common;
+use log::info;
 
 pub fn is_sdimage_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -28,14 +29,14 @@ pub fn extract_sdimage(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
     let mut e_i = 0;
     while file.stream_position()? < file.metadata()?.len() as u64 {
         let entry: EntryHeader = file.read_le()?;
-        println!("\n#{} - {} ({}), Size: {}, Version: {}.{}.{}.{}, Model ID: {}, Info: {}{} {}", 
+        info!("\n#{} - {} ({}), Size: {}, Version: {}.{}.{}.{}, Model ID: {}, Info: {}{} {}", 
                 e_i+1, entry.target_name(), entry.target_id, entry.size1, entry.version[3], entry.version[2], entry.version[1], entry.version[0], entry.model_id, entry.info(),
                 if entry.is_encrypted() {" [ENCRYPTED]"} else {""}, if entry.is_empty() {"[EMPTY]"} else {""});
 
         if !entry.is_empty() {
             let info = entry.info();
             let filename = info.split("FN=\"").nth(1).and_then(|s| s.split('"').next()).unwrap();
-            println!("- Filename: {}", filename);
+            info!("- Filename: {}", filename);
 
             let data = common::read_exact(&mut file, entry.size1 as usize)?;
 
@@ -47,7 +48,7 @@ pub fn extract_sdimage(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
             let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
             out_file.write_all(&data)?;
 
-            println!("-- Saved file!");
+            info!("-- Saved file!");
         }
 
         e_i += 1;

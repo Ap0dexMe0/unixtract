@@ -12,6 +12,7 @@ use crate::keys;
 use crate::formats::funai_upg::funai_des::funai_des_decrypt;
 use crate::formats::funai_upg::include::is_valid_ver_string;
 use include::*;
+use log::info;
 
 pub fn is_funai_upg_phl_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -46,7 +47,7 @@ pub fn extract_funai_upg_phl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result
                 let decrypted = funai_des_decrypt(&data, key_u32);
 
                 if is_valid_ver_string(&decrypted[..16]) {
-                    println!("Matched key: {}\nFirmware info: {}\nFirmware date: {}", 
+                    info!("Matched key: {}\nFirmware info: {}\nFirmware date: {}", 
                             key_hex, common::string_from_bytes(&decrypted[..16]), common::string_from_bytes(&decrypted[16..]));
                     key = Some(key_u32);
                     break
@@ -54,14 +55,14 @@ pub fn extract_funai_upg_phl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result
             }
         }
 
-        println!("\n#{} - Type: {}, Size: {}", i + 1, entry.body_type, entry.size);
+        info!("\n#{} - Type: {}, Size: {}", i + 1, entry.body_type, entry.size);
 
         if let Some(key_u32) = key {
-            println!("- Decrypting...");
+            info!("- Decrypting...");
             data = funai_des_decrypt(&data, key_u32);
 
         } else {
-            println!("- Warning! Failed to find decryption key, saving encrypted data")
+            info!("- Warning! Failed to find decryption key, saving encrypted data")
         }
 
         let output_path = Path::new(&app_ctx.output_dir).join(format!("{}.bin", entry.body_type));
@@ -70,7 +71,7 @@ pub fn extract_funai_upg_phl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
         out_file.write_all(&data)?;
 
-        println!("-- Saved file!");
+        info!("-- Saved file!");
 
     }
 

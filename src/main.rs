@@ -5,7 +5,7 @@ mod utils;
 
 use clap::Parser;
 use std::path::PathBuf;
-use std::io::{self, Seek, SeekFrom};
+use std::io::{self, Seek, SeekFrom, Write};
 use std::fs::{self, File};
 use crate::formats::{Format, get_registry};
 use crate::error::UnixtractError;
@@ -43,7 +43,7 @@ struct Args {
     #[arg(short, long)]
     quiet: bool,
 
-    /// Verbose mode — show detailed progress information
+    /// Verbose mode — show detailed progress information (use -vv for trace)
     #[arg(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
 }
@@ -59,6 +59,7 @@ pub struct AppContext {
     pub options: Vec<String>,
     pub dry_run: bool,
     pub quiet: bool,
+    pub verbose: u8,
 }
 
 impl AppContext {
@@ -81,15 +82,31 @@ impl AppContext {
     }
 }
 
+/// Clear the terminal screen
+fn clear_terminal() {
+    // ANSI escape sequence to clear screen and move cursor to top-left
+    eprint!("\x1B[2J\x1B[H");
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
 
+    // Clear the terminal on execution
+    if !args.quiet {
+        clear_terminal();
+    }
+
     // Initialize logger based on verbosity level
+    // Default (no flags): show info-level output (normal progress)
+    // -q: errors only
+    // -v: info (same as default, explicit)
+    // -vv: debug level (more details)
+    // -vvv: trace level (everything)
     let log_level = if args.quiet {
         "error"
     } else {
         match args.verbose {
-            0 => "warn",
+            0 => "info",
             1 => "info",
             2 => "debug",
             _ => "trace",
@@ -98,22 +115,34 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(log_level))
         .format_timestamp(None)
+        .format_target(false)
+        .format_module_path(false)
+        .format(|buf, record| {
+            // Clean format: just the message for info/debug/trace
+            // Add level prefix for warn/error so they stand out
+            match record.level() {
+                log::Level::Error => writeln!(buf, "[ERROR] {}", record.args()),
+                log::Level::Warn => writeln!(buf, "[WARN]  {}", record.args()),
+                log::Level::Info => writeln!(buf, "{}", record.args()),
+                log::Level::Debug => writeln!(buf, "[DBG]   {}", record.args()),
+                log::Level::Trace => writeln!(buf, "[TRC]   {}", record.args()),
+            }
+        })
         .init();
 
     // Handle --list-formats
     if args.list_formats {
         let formats = get_registry();
-        println!("Supported formats ({} total):", formats.len());
+        eprintln!("Supported formats ({} total):", formats.len());
         for (i, fmt) in formats.iter().enumerate() {
-            println!("  {:2}. {}", i + 1, fmt.name);
+            eprintln!("  {:2}. {}", i + 1, fmt.name);
         }
         return Ok(());
     }
 
-    log::info!("unixtract Firmware extractor v{}", env!("CARGO_PKG_VERSION"));
+    log::info!("unixtract v{}", env!("CARGO_PKG_VERSION"));
 
     let target_path_str = args.input_target.as_deref().unwrap_or("");
-    log::info!("Input target: {}", target_path_str);
     let target_path = PathBuf::from(target_path_str);
 
     let output_path_str = if let Some(ref out) = args.output_directory {
@@ -123,7 +152,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .and_then(|s| s.to_str())
             .ok_or_else(|| UnixtractError::Other("Invalid input file name".to_string()))?)
     };
-    log::info!("Output directory: {}", output_path_str);
     let output_directory_path = PathBuf::from(&output_path_str);
 
     if output_directory_path.exists() {
@@ -131,7 +159,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let is_empty = fs::read_dir(&output_directory_path)?.next().is_none();
             if !is_empty && !args.quiet {
                 log::warn!("Output folder already exists and is NOT empty! Files may be overwritten.");
-                eprintln!("Warning: Output folder already exists and is NOT empty! Files may be overwritten!");
                 eprintln!("Press Enter if you want to continue...");
                 io::stdin().read_line(&mut String::new())?;
             }
@@ -149,6 +176,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             options: args.options,
             dry_run: args.dry_run,
             quiet: args.quiet,
+            verbose: args.verbose,
         };
     } else if target_path.is_dir() {
         app_ctx = AppContext {
@@ -157,25 +185,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             options: args.options,
             dry_run: args.dry_run,
             quiet: args.quiet,
+            verbose: args.verbose,
         };
     } else {
         return Err("Invalid input path!".into());
     }
 
     let formats: Vec<Format> = get_registry();
-    log::info!("Loaded {} formats", formats.len());
 
     for format in formats {
         if let Some(ctx) = (format.detector_func)(&app_ctx)? {
-            log::info!("{} detected!", format.name);
-            if !app_ctx.quiet {
-                println!("\n{} detected!", format.name);
-            }
+            log::info!("\n{} detected!", format.name);
 
             if app_ctx.dry_run {
-                if !app_ctx.quiet {
-                    println!("Dry run — skipping extraction.");
-                }
+                log::info!("Dry run — skipping extraction.");
                 return Ok(());
             }
 
@@ -187,15 +210,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             (format.extractor_func)(&app_ctx, ctx)?;
 
             // Extractor returned with no error
-            if !app_ctx.quiet {
-                println!("\nExtraction finished! Saved extracted files to {}", output_path_str);
-            }
+            log::info!("\nExtraction finished! Saved extracted files to {}", output_path_str);
             return Ok(());
         }
     }
 
-    if !app_ctx.quiet {
-        println!("\nInput format not recognized!");
-    }
+    log::warn!("\nInput format not recognized!");
     Err("Unrecognized input format".into())
 }

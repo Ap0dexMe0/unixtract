@@ -13,6 +13,7 @@ use binrw::BinReaderExt;
 use crate::utils::common;
 use include::*;
 use tsb_des::decrypt;
+use log::info;
 
 struct TsbBinCtx {
     key: Option<[u8; 8]>
@@ -44,11 +45,11 @@ pub fn is_tsb_bin_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box
 
 pub fn extract_tsb_bin(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<TsbBinCtx>().expect("Missing context");
+    let ctx = ctx.downcast::<TsbBinCtx>().map_err(|_| "Invalid context type")?;
 
     let mut header = common::read_file(&mut file, 0, 0x400)?;
     if let Some(key) = ctx.key {    //decrypt header
-        println!("File is encrypted, using key: {}", hex::encode(&key));
+        info!("File is encrypted, using key: {}", hex::encode(&key));
         header = decrypt(&header, &key);
         opt_dump_dec_hdr(app_ctx, &header, "header")?;
     }
@@ -56,17 +57,17 @@ pub fn extract_tsb_bin(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
     let mut hdr_rdr = Cursor::new(header);
     let hdr: Header = hdr_rdr.read_be()?;
 
-    println!("File info -\nSize: {}\nEntry count: {}\nBuild no.: {}\nEntry address: 0x{:02x}"
+    info!("File info -\nSize: {}\nEntry count: {}\nBuild no.: {}\nEntry address: 0x{:02x}"
             ,hdr.length, hdr.entry_count, hdr.build_no(), hdr.entry_addr);
 
     for (i, entry) in hdr.entries.iter().enumerate() {
-        println!("\n({}/{}) - {}, Size: {}, Offset: {}, Load address: 0x{:02x}",
+        info!("\n({}/{}) - {}, Size: {}, Offset: {}, Load address: 0x{:02x}",
                 i+1, hdr.entry_count, entry.name(), entry.size, entry.offset, entry.load_addr);
         
         let mut data;
         if let Some(key) = ctx.key {
             let enc_data = common::read_file(&mut file, entry.offset as u64, (entry.size as usize + 7) & !7)?;  //read aligned to 8b blocks for decryption
-            println!("- Decrypting...");
+            info!("- Decrypting...");
             data = decrypt(&enc_data, &key);
             data.truncate(entry.size as usize); //discard alignment
 
@@ -75,7 +76,7 @@ pub fn extract_tsb_bin(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
         }
 
         if entry.is_compressed() {
-            println!("- Decompressing...");
+            info!("- Decompressing...");
             data = decompress_zlib(&data)?;
         }
 
@@ -85,7 +86,7 @@ pub fn extract_tsb_bin(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
         out_file.write_all(&data)?;
 
-        println!("-- Saved file!");
+        info!("-- Saved file!");
     }
 
     Ok(())

@@ -12,6 +12,7 @@ use crate::utils::compression::{decompress_lzma, decompress_lz4};
 use crate::utils::lzop::{unlzop_to_file};
 use crate::utils::sparse::{unsparse_to_file};
 use include::*;
+use log::info;
 
 pub fn is_mstar_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -35,9 +36,9 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
     }
 
     let mut script_string = String::from_utf8_lossy(&script);
-    if script_string == "" {
+    if script_string.is_empty() {
         //try for hisense
-        println!("Failed to get script at 0x0, trying 0x1000...");
+        info!("Failed to get script at 0x0, trying 0x1000...");
         script = common::read_file(&file, 4096, 32768)?;
 
         if let Some(pos) = script.iter().position(|x| [0x00, 0xFF].contains(x)) {
@@ -46,16 +47,15 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
 
         script_string = String::from_utf8_lossy(&script);
 
-        if script_string == "" {
+        if script_string.is_empty() {
             return Err("Failed to get script".into());
         }
     }
     opt_dump_dec_hdr(app_ctx, &script, "script")?;
 
     let lines: Vec<&str> = script_string.lines().map(|l| l.trim()).collect();
-    let mut i = 0;
 
-    for line in &lines {
+    for (i, line) in lines.iter().enumerate() {
         if line.starts_with("filepartload") {
             let parts: Vec<&str> = line.split_whitespace().collect();
             let offset = parse_number(parts[3]).unwrap_or(0);
@@ -113,7 +113,7 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
                 }
 
                 // try to get partname from nand/mmc/ubi writes
-                if lines[j].starts_with("mmc write") | lines[j].starts_with("nand write") | lines[j].starts_with("ubi write"){
+                if lines[j].starts_with("mmc write") || lines[j].starts_with("nand write") || lines[j].starts_with("ubi write"){
                     let parts: Vec<&str> = lines[j].split_whitespace().collect();
                     if partname == "unknown" {
                         partname = parts[3]
@@ -123,17 +123,16 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
                 j += 1;
             }
 
-            println!("\nPart - Offset: {}, Size: {} --> {}", offset, size, partname);
+            info!("\nPart - Offset: {}, Size: {} --> {}", offset, size, partname);
 
-            let data = common::read_file(&file, offset, size.try_into().unwrap())?;
+            let data = common::read_file(&file, offset, size.try_into().map_err(|_| "Size conversion failed")?)?;
             let out_data; 
             let output_path = if partname == "unknown" {
                 if app_ctx.has_option("mstar:keep_unknown") {
-                    println!("- Warning, unknown destination - saving to _unknown_{}.bin", offset);
+                    info!("- Warning, unknown destination - saving to _unknown_{}.bin", offset);
                     Path::new(&app_ctx.output_dir).join(format!("_unknown_{}.bin", offset))
                 } else {
-                    println!("- Warning, unknown destination - skipping...");
-                    i += 1;
+                    info!("- Warning, unknown destination - skipping...");
                     continue;
                 }
             } else {
@@ -141,27 +140,25 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
             };
 
             if compression == CompressionType::Lzma {
-                println!("- Decompressing LZMA...");
+                info!("- Decompressing LZMA...");
                 out_data = decompress_lzma(&data)?;
             } else if compression == CompressionType::DoubleLzma {
-                println!("- Decompressing LZMA (Pass 1)...");
+                info!("- Decompressing LZMA (Pass 1)...");
                 let pass_1 = decompress_lzma(&data)?;
-                println!("- Decompressing LZMA (Pass 2)...");
+                info!("- Decompressing LZMA (Pass 2)...");
                 out_data = decompress_lzma(&pass_1)?;
             } else if compression == CompressionType::Lz4 {
-                println!("- Decompressing lz4, expected size: {}", lz4_expect_size);
+                info!("- Decompressing lz4, expected size: {}", lz4_expect_size);
                 out_data = decompress_lz4(&data, lz4_expect_size.try_into().unwrap())?;
             } else if compression == CompressionType::Lzo {
-                println!("- Decompressing LZO..");
+                info!("- Decompressing LZO..");
                 unlzop_to_file(&data, output_path)?;
-                println!("-- Saved file!");
-                i += 1;
+                info!("-- Saved file!");
                 continue
             } else if compression == CompressionType::Sparse {
-                println!("- Unsparsing...");
+                info!("- Unsparsing...");
                 unsparse_to_file(&data, output_path)?;
-                println!("-- Saved file!");
-                i += 1;
+                info!("-- Saved file!");
                 continue
             } else {
                 out_data = data;
@@ -170,10 +167,8 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
             fs::create_dir_all(&app_ctx.output_dir)?;
             let mut out_file = OpenOptions::new().append(true).create(true).open(output_path)?;
             out_file.write_all(&out_data)?;
-            println!("-- Saved file!");
+            info!("-- Saved file!");
         }
-
-        i += 1;
     }
 
     Ok(())

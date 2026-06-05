@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub fn is_cd5_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -32,7 +33,7 @@ pub fn extract_cd5(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
     let dwld_hdr: DownloadHeader = dwld_hdr_reader.read_be()?;
 
     // like Loader Data screen
-    println!("File info -\nManufacturer code: {}\nHardware Version: {}\nVersion(DSN): {}(0x{:02x})\nVariant/Sub-variant: 0x{:02x}/0x{:02x}\nModule count: {}",
+    info!("File info -\nManufacturer code: {}\nHardware Version: {}\nVersion(DSN): {}(0x{:02x})\nVariant/Sub-variant: 0x{:02x}/0x{:02x}\nModule count: {}",
             dwld_hdr.manufacturer_code, dwld_hdr.hardware_version, dwld_hdr.version, dwld_hdr.version, dwld_hdr.variant, dwld_hdr.sub_variant, dwld_hdr.module_count);
 
     for (i, module) in dwld_hdr.module_entries.iter().enumerate() {
@@ -46,7 +47,7 @@ pub fn extract_cd5(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
             return Err("Module id mismatch in download header and module header!".into());
         }
 
-        println!("\n({}/{}) Module {}(0x{:02x}) - Version(DSN): {}(0x{:02x}), Size: {}, Segment size: {}, Segment count: {} {}",
+        info!("\n({}/{}) Module {}(0x{:02x}) - Version(DSN): {}(0x{:02x}), Size: {}, Segment size: {}, Segment count: {} {}",
                 i+1, dwld_hdr.module_count, mod_hdr.module_id, mod_hdr.module_id, module.version, module.version, mod_hdr.out_size, mod_hdr.segment_size, mod_hdr.segment_count,
                 if mod_hdr.is_encrypted() {"[ENCRYPTED]"} else {""});
 
@@ -61,19 +62,19 @@ pub fn extract_cd5(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
                 return Err("Module id mismatch in segment and module header!".into());
             }
 
-            println!("  Segment {}/{} - Size: {}", s_i+1, mod_hdr.segment_count, segment.data_size);
+            info!("  Segment {}/{} - Size: {}", s_i+1, mod_hdr.segment_count, segment.data_size);
             module_data.append(&mut segment.data);
         }
 
         let out_data;
         if mod_hdr.is_encrypted() {
-            println!("- Warning: data is encrypted, so cannot read inner header - saving ENCRYPTED data!");
+            info!("- Warning: data is encrypted, so cannot read inner header - saving ENCRYPTED data!");
             out_data = module_data;
         }
         else {
             let mut mod_data_rdr = Cursor::new(module_data);
             let inner_mod_hdr: InnerModuleHeader = mod_data_rdr.read_be()?;
-            println!("- Inner header size: {}, Data size: {}", inner_mod_hdr.header_size, inner_mod_hdr.data_size);
+            info!("- Inner header size: {}, Data size: {}", inner_mod_hdr.header_size, inner_mod_hdr.data_size);
             mod_data_rdr.seek(SeekFrom::Start(inner_mod_hdr.header_size as u64))?;
             out_data = common::read_exact(&mut mod_data_rdr, inner_mod_hdr.data_size as usize)?;
         }
@@ -83,7 +84,7 @@ pub fn extract_cd5(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;        
         out_file.write_all(&out_data)?;
 
-        println!("-- Saved file!");
+        info!("-- Saved file!");
 
     }
 

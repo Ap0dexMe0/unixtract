@@ -14,6 +14,7 @@ use crate::keys;
 use crate::formats::mtk_pkg::lzhs::{decompress_mtk_to_file};
 use crate::formats::mtk_pkg::include::{Header, PartEntry, MTK_HEADER_MAGIC, MTK_META_MAGIC, MTK_META_PAD_MAGIC};
 use include::*;
+use log::{info, warn};
 
 pub struct MtkPkgNewContext {
     matching_key_name: String,
@@ -46,12 +47,12 @@ pub fn is_mtk_pkg_new_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>,
 
 pub fn extract_mtk_pkg_new(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<MtkPkgNewContext>().expect("Missing context");
+    let ctx = ctx.downcast::<MtkPkgNewContext>().map_err(|_| "Invalid context type")?;
 
     let file_size = file.metadata()?.len();
 
     //the key was founf, and header was decrypted at detection stage so we can reuse
-    println!("Using key {}", ctx.matching_key_name);
+    info!("Using key {}", ctx.matching_key_name);
     let key_array = ctx.matching_key_key;
     let iv_array = ctx.matching_key_iv;
     let header = ctx.decrypted_header;
@@ -60,7 +61,7 @@ pub fn extract_mtk_pkg_new(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
     let mut hdr_reader = Cursor::new(header); 
     let hdr: Header = hdr_reader.read_le()?;
 
-    println!("File info:\nFile size: {}\nVendor magic: {}\nVersion info: {}\nProduct name: {}" , 
+    info!("File info:\nFile size: {}\nVendor magic: {}\nVersion info: {}\nProduct name: {}" , 
             hdr.file_size, hdr.vendor_magic(), hdr.version(), hdr.product_name());
 
     file.seek(SeekFrom::Start(HEADER_SIZE as u64))?;
@@ -73,19 +74,19 @@ pub fn extract_mtk_pkg_new(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
             break
         }
 
-        println!("\n#{} - {}, Size: {}{} {}", 
+        info!("\n#{} - {}, Size: {}{} {}", 
                 part_n, part_entry.name(), part_entry.size, if part_entry.is_compressed() {" [COMPRESSED]"} else {""}, if part_entry.is_encrypted() {"[ENCRYPTED]"} else {""} );
 
         let data = common::read_exact(&mut file, part_entry.size as usize + 48)?;
         
         if part_entry.size == 0 {
-            println!("- Empty entry, skipping!");
+            info!("- Empty entry, skipping!");
             continue
         }
 
         let mut out_data;
         if part_entry.is_encrypted() {
-            println!("- Decrypting...");
+            info!("- Decrypting...");
             //data aligned to 16 bytes is AES encrypted. the remaining unaligned data is XORed with the key
             let align_len = data.len() & !15;
             let (aes_enc, xor_tail) = data.split_at(align_len);
@@ -103,7 +104,7 @@ pub fn extract_mtk_pkg_new(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
             if imtk_len != 0 && &out_data[56..60] != MTK_META_PAD_MAGIC {
                 let version_len = u32::from_le_bytes(out_data[56..60].try_into().unwrap());
                 let version = common::string_from_bytes(&out_data[60..60 + version_len as usize]);
-                println!("- Version: {}", version);
+                info!("- Version: {}", version);
             }
             imtk_len + 8
         } else {
@@ -118,18 +119,18 @@ pub fn extract_mtk_pkg_new(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
         if part_entry.is_compressed() {
             match decompress_mtk_to_file(&fin_data, &output_path) {
                 Ok(()) => {
-                    println!("-- Decompressed Successfully, Saved file!");
+                    info!("-- Decompressed Successfully, Saved file!");
                     continue
                 },
                 Err(e) => {
-                    eprintln!("Failed to decompress partition!, Error: {}. Saving compressed data...", e);
+                    warn!("Failed to decompress partition!, Error: {}. Saving compressed data...", e);
                 }
             }
         }
 
         let mut out_file = OpenOptions::new().write(true).create(true).open(&output_path)?;
         out_file.write_all(&fin_data)?;
-        println!("-- Saved file!");
+        info!("-- Saved file!");
     }
 
     Ok(())

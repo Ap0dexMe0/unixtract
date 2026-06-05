@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub struct SlpContext {
     variant: SlpVariant,
@@ -39,10 +40,10 @@ pub fn is_slp_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn
 
 pub fn extract_slp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<SlpContext>().expect("Missing context");
+    let ctx = ctx.downcast::<SlpContext>().map_err(|_| "Invalid context type")?;
 
     let meta_header: CommonMetaHeader = file.read_le()?;
-    println!("File info:\nType: {:?}\nProject name: {}\nFirmware Version: {}\nFirmware Version(USER): {}",
+    info!("File info:\nType: {:?}\nProject name: {}\nFirmware Version: {}\nFirmware Version(USER): {}",
             ctx.variant, meta_header.project_name(), meta_header.firmware_version(), meta_header.user_version());
 
     let num_image;
@@ -50,21 +51,21 @@ pub fn extract_slp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
     if ctx.variant == SlpVariant::New {
         let meta_header_ext: MetaHeaderExtNew = file.read_le()?;
         if meta_header_ext.snapshot_included == 0x01 {
-            println!("Snapshot Image: Included");
-            println!("S/S Img. Board Version: {}", meta_header_ext.snapshot_board_version())
+            info!("Snapshot Image: Included");
+            info!("S/S Img. Board Version: {}", meta_header_ext.snapshot_board_version())
         } else {
-            println!("Snapshot Image: Excluded");
+            info!("Snapshot Image: Excluded");
         }
         num_image = meta_header_ext.num_image;
     }
     else if ctx.variant == SlpVariant::Old {
         let meta_header_ext: MetaHeaderExtOld = file.read_le()?;
         if meta_header_ext.snapshot_included == 0x01 {
-            println!("Snapshot Image: Included");
-            println!("Snapshot Image offset: {}", meta_header_ext.snapshot_entry_offset);
+            info!("Snapshot Image: Included");
+            info!("Snapshot Image offset: {}", meta_header_ext.snapshot_entry_offset);
             snapshot_entry_offset = Some(meta_header_ext.snapshot_entry_offset);
         } else {
-            println!("Snapshot Image: Excluded");
+            info!("Snapshot Image: Excluded");
         }
         num_image = 5; //hardcoded for old variant
     }
@@ -95,7 +96,7 @@ pub fn extract_slp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
     }
 
     for (i, entry) in entries.iter().enumerate() {
-        println!("\n({}/{}) - Offset: {}, Size: {}, Magic: 0x{:02X}", i+1, &entries.len(), entry.offset, entry.size, entry.magic);
+        info!("\n({}/{}) - Offset: {}, Size: {}, Magic: 0x{:02X}", i+1, &entries.len(), entry.offset, entry.size, entry.magic);
 
         let output_path = Path::new(&app_ctx.output_dir).join(format!("{}.bin", i+1));
 
@@ -106,7 +107,7 @@ pub fn extract_slp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;         
         out_file.write_all(&data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
     }
 
     Ok(())

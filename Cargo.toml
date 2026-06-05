@@ -4,7 +4,11 @@ version = "0.2.0"
 edition = "2024"
 description = "Firmware extractor for various file formats from TVs and AV devices"
 license = "GPL-3.0"
-repository = "https://github.com/theubusu/unixtract"
+repository = "https://github.com/Ap0dexMe0/unixtract"
+
+[features]
+default = ["zstd"]
+zstd = ["dep:zstd"]
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
@@ -27,7 +31,7 @@ prost-types = "0.14.1"
 bzip2 = "0.6.1"
 liblzma = "0.4.5"
 des = "0.8.1"
-zstd = "0.13.3"
+zstd = { version = "0.13.3", optional = true }
 thiserror = "2.0"
 log = "0.4"
 env_logger = "0.11"

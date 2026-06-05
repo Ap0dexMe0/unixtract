@@ -11,6 +11,7 @@ use binrw::BinReaderExt;
 use crate::utils::common;
 use crate::utils::aes::{decrypt_aes128_cbc_nopad, decrypt_aes128_cbc_pcks7};
 use include::*;
+use log::info;
 
 pub fn is_roku_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -31,7 +32,7 @@ pub fn extract_roku(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
     let mut encrypted_data = Vec::new();
     file.read_to_end(&mut encrypted_data)?;
 
-    println!("\nDecrypting...\n");
+    info!("\nDecrypting...\n");
     let tar_data = decrypt_aes128_cbc_pcks7(&encrypted_data, &FILE_KEY, &FILE_IV)?;
     let tar_reader = Cursor::new(tar_data);
     let mut tar_archive = Archive::new(tar_reader);
@@ -47,20 +48,20 @@ pub fn extract_roku(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
             entry.read_to_end(&mut contents)?;
 
             let text = String::from_utf8_lossy(&contents[..size - 256]); //dont display signature
-            println!("Manifest file:\n{}", text);
+            info!("Manifest file:\n{}", text);
         } else {
             let mut contents = Vec::new();
             entry.read_to_end(&mut contents)?; //entry cant seek
             
             if contents.starts_with(b"\x00\x00\x00\x00\x00\x00\x00\x00imgARMcC") {
-                println!("\nImage file: {:?}:", path);
+                info!("\nImage file: {:?}:", path);
                 let size = entry.header().size()? as usize;
                 let mut image_reader = Cursor::new(contents);
                 let mut i = 1;
 
                 while image_reader.stream_position()? < size as u64 {
                     let image: AImageHeader = image_reader.read_le()?;
-                    println!("  #{} - Type: {}(0x{:x}), Length: {}, encmode: {}",
+                    info!("  #{} - Type: {}(0x{:x}), Length: {}, encmode: {}",
                            i, image.image_type_str(), image.image_type, image.length, image.encmode_str());
 
                     let data =
@@ -80,20 +81,20 @@ pub fn extract_roku(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
                     let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
                     out_file.write_all(&data)?;
 
-                    println!("  - Saved file!\n");
+                    info!("  - Saved file!\n");
 
                     i += 1;
                 }
 
             } else {
-                println!("\nOther/Unknown file: {:?}", path);
+                info!("\nOther/Unknown file: {:?}", path);
                 let output_path = Path::new(&app_ctx.output_dir).join(&path);
 
                 fs::create_dir_all(&app_ctx.output_dir)?;
                 let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
                 out_file.write_all(&contents)?;
 
-                println!("- Saved file!");
+                info!("- Saved file!");
             }
         }
     }

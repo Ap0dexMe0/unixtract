@@ -11,6 +11,7 @@ use crate::utils::common;
 use crate::keys;
 use crate::utils::aes::{decrypt_aes128_cbc_pcks7};
 use include::*;
+use log::info;
 
 pub fn is_ruf_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -28,9 +29,9 @@ pub fn extract_ruf(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
 
     let header: RufHeader = file.read_be()?;
     if header.is_dual_ruf() {
-        println!("\nDual RUF detected! Extracting 1st RUF...\n");
+        info!("\nDual RUF detected! Extracting 1st RUF...\n");
         actually_extract_ruf(file, &app_ctx.output_dir.join("RUF_1"), 0)?;
-        println!("\nExtracting 2nd RUF...\n");
+        info!("\nExtracting 2nd RUF...\n");
         actually_extract_ruf(file, &app_ctx.output_dir.join("RUF_2"), 41943088)?;
     } else {
         actually_extract_ruf(file, &app_ctx.output_dir, 0)?;
@@ -43,10 +44,10 @@ fn actually_extract_ruf(mut file: &File, output_folder: &PathBuf, start_offset: 
     file.seek(SeekFrom::Start(start_offset))?;
     let header: RufHeader = file.read_be()?;
 
-    println!("File info:\nBuyer: {} \nModel: {} \nRegion Info: {} \nDateTime: {}\nVersion:{:02x?} \nData Size: {} \nDual RUF: {}",
+    info!("File info:\nBuyer: {} \nModel: {} \nRegion Info: {} \nDateTime: {}\nVersion:{:02x?} \nData Size: {} \nDual RUF: {}",
             header.buyer(), header.model(), header.region_info(), header.date_time(), header.version_bytes, header.data_size, header.is_dual_ruf());
     
-    println!("\nPayload count: {}", header.payload_count);
+    info!("\nPayload count: {}", header.payload_count);
     file.seek(SeekFrom::Start(start_offset + header.payloads_start_offset as u64))?;
 
     let mut entries: Vec<RufEntry> = Vec::new();
@@ -64,7 +65,7 @@ fn actually_extract_ruf(mut file: &File, output_folder: &PathBuf, start_offset: 
             vi += 1
         }
 
-        println!("{}/{}: Type: {}({}), Size: {}",
+        info!("{}/{}: Type: {}({}), Size: {}",
                 vi, header.payload_count, entry.payload_type_bytes, entry.payload_type(), entry.size);
         
         entries.push(entry);
@@ -82,7 +83,7 @@ fn actually_extract_ruf(mut file: &File, output_folder: &PathBuf, start_offset: 
         }
     }
     if let Some(k) = key {
-        println!("\nKey: {}", k);
+        info!("\nKey: {}", k);
         key_bytes = hex::decode(k)?.as_slice().try_into()?;
     } else {
         return Err("This firmware is not supported!".into());
@@ -90,14 +91,14 @@ fn actually_extract_ruf(mut file: &File, output_folder: &PathBuf, start_offset: 
 
     file.seek(SeekFrom::Start(start_offset + 2048))?;
     let encrypted_data = common::read_exact(&mut file, header.data_size as usize)?;
-    println!("Decrypting data...");
+    info!("Decrypting data...");
     let decrypted_data = decrypt_aes128_cbc_pcks7(&encrypted_data, &key_bytes, &iv_bytes)?;
 
     let mut data_reader = Cursor::new(decrypted_data);
 
     let mut ei = 1;
     for entry in entries {
-        println!("\n({}/{}) - {}({}), Size: {}",
+        info!("\n({}/{}) - {}({}), Size: {}",
             ei, header.payload_count, entry.payload_type_bytes, entry.payload_type(), entry.size);
 
         let data = common::read_exact(&mut data_reader, entry.size as usize)?;
@@ -108,7 +109,7 @@ fn actually_extract_ruf(mut file: &File, output_folder: &PathBuf, start_offset: 
             
         out_file.write_all(&data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
 
         ei += 1;
     }

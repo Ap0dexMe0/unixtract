@@ -8,6 +8,7 @@ use crate::utils::aes::decrypt_aes128_ecb;
 use crate::keys;
 
 use include::*;
+use log::info;
 
 pub struct VestelCtx {
     pub is_encrypted: bool,
@@ -91,7 +92,7 @@ pub fn extract_vestel(
     app_ctx: &AppContext,
     ctx: Box<dyn Any>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let ctx = ctx.downcast::<VestelCtx>().expect("Missing context");
+    let ctx = ctx.downcast::<VestelCtx>().map_err(|_| "Invalid context type")?;
 
     match ctx.variant {
         VestelVariant::Mb230 => extract_mb230(app_ctx, &ctx),
@@ -116,8 +117,8 @@ fn extract_standard(
     let key: [u8; 16] = key_vec.try_into().map_err(|_| "Invalid AES key length")?;
 
     let (final_data, decrypted_path) = if ctx.is_encrypted {
-        println!("Encrypted Vestel firmware detected");
-        println!("Using key: {} ({})", "VESTEL", key_hex);
+        info!("Encrypted Vestel firmware detected");
+        info!("Using key: {} ({})", "VESTEL", key_hex);
 
         let dec = decrypt_aes128_ecb(&key, &data)?;
 
@@ -129,12 +130,12 @@ fn extract_standard(
 
         (dec, Some(output_path))
     } else {
-        println!("Detected Vestel firmware (unencrypted)");
+        info!("Detected Vestel firmware (unencrypted)");
         (data, None)
     };
 
     let partitions = VESTEL_PARTITIONS;
-    println!("\nPartition count: {}", partitions.len());
+    info!("\nPartition count: {}", partitions.len());
 
     fs::create_dir_all(&app_ctx.output_dir)?;
 
@@ -143,14 +144,14 @@ fn extract_standard(
         let end = start.saturating_add(*size);
 
         if start >= final_data.len() {
-            println!("Skipping {} (out of range)", name);
+            info!("Skipping {} (out of range)", name);
             continue;
         }
 
         let end = end.min(final_data.len());
         let segment = &final_data[start..end];
 
-        println!(
+        info!(
             "\n{} - Offset: 0x{:X}, Size: 0x{:X}",
             name, offset, size
         );
@@ -160,7 +161,7 @@ fn extract_standard(
 
         fs::write(&output_path, segment)?;
 
-        println!("- Saved {}.bin", name);
+        info!("- Saved {}.bin", name);
     }
 
     if let Some(path) = decrypted_path {
@@ -181,11 +182,11 @@ fn extract_mb230(
     let file_size = file.metadata()?.len() as usize;
     let data = common::read_exact(&mut file, file_size)?;
 
-    println!("Detected Vestel MB230 firmware (Novatek NT72673)");
-    println!("File size: {} bytes ({:.2} MB)", file_size, file_size as f64 / 1024.0 / 1024.0);
+    info!("Detected Vestel MB230 firmware (Novatek NT72673)");
+    info!("File size: {} bytes ({:.2} MB)", file_size, file_size as f64 / 1024.0 / 1024.0);
 
     let partitions = MB230_PARTITIONS;
-    println!("\nPartition count: {}", partitions.len());
+    info!("\nPartition count: {}", partitions.len());
 
     fs::create_dir_all(&app_ctx.output_dir)?;
 
@@ -194,14 +195,14 @@ fn extract_mb230(
         let end = start.saturating_add(*size);
 
         if start >= file_size {
-            println!("Skipping {} (out of range)", name);
+            info!("Skipping {} (out of range)", name);
             continue;
         }
 
         let end = end.min(file_size);
         let segment = &data[start..end];
 
-        println!(
+        info!(
             "\n{} - Offset: 0x{:X}, Size: 0x{:X} ({} bytes)",
             name, offset, size, segment.len()
         );
@@ -211,7 +212,7 @@ fn extract_mb230(
 
         fs::write(&output_path, segment)?;
 
-        println!("- Saved {}.bin", name);
+        info!("- Saved {}.bin", name);
     }
 
     Ok(())

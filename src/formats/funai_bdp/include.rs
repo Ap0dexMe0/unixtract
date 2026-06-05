@@ -40,7 +40,7 @@ pub fn is_cmpr(data: &[u8], size: u32) -> bool {
 
     if count > size || data_size > size {return false};
 
-    return (size - 0x20 - (count*12) - 12) == data_size;
+    (size - 0x20 - (count*12) - 12) == data_size
 }
 
 //image rom

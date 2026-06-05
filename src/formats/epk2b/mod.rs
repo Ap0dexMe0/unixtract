@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub fn is_epk2b_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -26,7 +27,7 @@ pub fn extract_epk2b(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
 
     let header: EpkHeader = file.read_le()?;
-    println!("EPK info -\nData size: {}\nPak count: {}\nOTA ID: {}\nVersion: {:02x?}.{:02x?}.{:02x?}", 
+    info!("EPK info -\nData size: {}\nPak count: {}\nOTA ID: {}\nVersion: {:02x?}.{:02x?}.{:02x?}", 
             header.file_size, header.pak_count, header.ota_id(), header.version[2], header.version[1], header.version[0]);
 
     let mut paks: Vec<Pak> = Vec::new();
@@ -49,7 +50,7 @@ pub fn extract_epk2b(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
 
         let mut all_segment_size = 0;
 
-        println!("\n({}/{}) - {}, Size: {}, Segment count: {}, Platform: {}", 
+        info!("\n({}/{}) - {}, Size: {}, Segment count: {}, Platform: {}", 
                 i + 1, paks.len(), pak_header.pak_name(), pak_header.image_size, pak_header.segment_count, pak_header.platform_id());
 
         let output_path = Path::new(&app_ctx.output_dir).join(format!("{}.bin", pak_header.pak_name()));
@@ -66,7 +67,7 @@ pub fn extract_epk2b(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
                 return Err(format!("Unexpected segment index in pak header!, expected: {}, got: {}", i , pak_header.segment_index).into());
             }
 
-            println!("- Segment {}/{} - Size: {}", i + 1, pak_header.segment_count, pak_header.segment_size);
+            info!("- Segment {}/{} - Size: {}", i + 1, pak_header.segment_count, pak_header.segment_size);
             let out_data = common::read_exact(&mut file, pak_header.segment_size as usize)?;
             all_segment_size += pak_header.segment_size;
 
@@ -80,7 +81,7 @@ pub fn extract_epk2b(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
 
             out_file.write_all(&out_data[..segment_limit as usize])?;
 
-            println!("-- Saved to file!");
+            info!("-- Saved to file!");
         }
     }
 

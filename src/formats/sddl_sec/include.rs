@@ -50,7 +50,7 @@ pub fn decipher(s: &[u8]) -> Vec<u8> {
 
 pub fn decrypt_3des(encrypted_data: &[u8], key_entry: &DesKeyEntry) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let mut data = encrypted_data.to_vec();
-    let decryptor = Decryptor::<TdesEde3>::new_from_slices(&key_entry.key, &key_entry.iv).unwrap();
+    let decryptor = Decryptor::<TdesEde3>::new_from_slices(&key_entry.key, &key_entry.iv).map_err(|e| format!("Invalid 3DES key: {}", e))?;
 
     let out_data = decryptor.decrypt_padded_mut::<NoPadding>(&mut data)
         .map_err(|e| format!("!!Decryption error!!: {:?}", e))?;
@@ -142,15 +142,15 @@ pub struct SecHeader {
 impl SecHeader {
     pub fn key_id(&self) -> u32 {
         let string = string_from_bytes(&self.key_id_str_bytes);
-        string.parse().unwrap()
+        string.parse::<u32>().expect("Invalid key_id in sec header")
     }
     pub fn grp_num(&self) -> u32 {
         let string = string_from_bytes(&self.grp_num_str_bytes);
-        string.parse().unwrap()
+        string.parse::<u32>().expect("Invalid grp_num in sec header")
     }
     pub fn prg_num(&self) -> u32 {
         let string = string_from_bytes(&self.prg_num_str_bytes);
-        string.parse().unwrap()
+        string.parse::<u32>().expect("Invalid prg_num in sec header")
     }
 }
 
@@ -167,7 +167,7 @@ impl FileHeader {
     }
     pub fn size(&self) -> u64 {
         let string = string_from_bytes(&self.size_str_bytes);
-        string.parse().unwrap()
+        string.parse::<u64>().expect("Invalid size in file header")
     }
 }
 

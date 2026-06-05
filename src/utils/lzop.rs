@@ -5,6 +5,7 @@ use std::io::{Cursor, Write};
 
 use simd_adler32::adler32;
 use crate::utils::common;
+use log::info;
 
 #[derive(BinRead)]
 struct LzopHeader {
@@ -48,7 +49,7 @@ pub fn unlzop_to_file(data: &[u8], file_path: PathBuf) -> Result<(), Box<dyn std
         }
         let segment_header: SegmentHeader = data_reader.read_be()?;
         if segment_header.compressed_size > segment_header.uncompressed_size {
-            println!("{:?}", segment_header);
+            info!("{:?}", segment_header);
         }
         if segment_header.uncompressed_size == 0 {
             break

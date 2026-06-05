@@ -13,6 +13,7 @@ use crate::keys;
 use crate::formats::epk::find_key;
 use crate::utils::aes::decrypt_aes_ecb_auto;
 use include::*;
+use log::info;
 
 pub fn is_epk2_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -37,14 +38,14 @@ pub fn extract_epk2(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
     //check if header is encrypted
     let epak = &stored_header[0..4]; // epak magic
     if epak == b"epak" {
-        println!("Header is not encrypted.");
+        info!("Header is not encrypted.");
         header = stored_header;
     } else {
-        println!("Header is encrypted...");
-        println!("\nFinding key...");
+        info!("Header is encrypted...");
+        info!("\nFinding key...");
         //find the key, knowing that the header should start with "epak"
         if let Some((key_name, key_bytes)) = find_key(&keys::EPK, &stored_header, b"epak")? {
-            println!("Found valid key: {}", key_name);
+            info!("Found valid key: {}", key_name);
             matching_key = Some(key_bytes);
             header = decrypt_aes_ecb_auto(matching_key.as_ref().unwrap(), &stored_header)?;
             opt_dump_dec_hdr(app_ctx, &header, "header")?;
@@ -57,7 +58,7 @@ pub fn extract_epk2(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
     let mut hdr_reader = Cursor::new(header); 
     let hdr: Header = hdr_reader.read_le()?;
 
-    println!("\nEPK info -\nData size: {}\nPak count: {}\nOTA ID: {}\nVersion: {:02x?}.{:02x?}.{:02x?}.{:02x?}\n", 
+    info!("\nEPK info -\nData size: {}\nPak count: {}\nOTA ID: {}\nVersion: {:02x?}.{:02x?}.{:02x?}.{:02x?}\n", 
                 hdr.file_size, hdr.pak_count, hdr.ota_id(), hdr.version[3], hdr.version[2], hdr.version[1], hdr.version[0]);
  
     let mut paks: Vec<Pak> = Vec::new();
@@ -65,7 +66,7 @@ pub fn extract_epk2(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
     for i in 0..hdr.pak_count {
         let pak: PakEntry = hdr_reader.read_le()?;
         //here the accounted for signature is the one at the beginning of the EPK file
-        println!("Pak {} - {}, offset: {}, size: {}, segment size: {}", i + 1, pak.name(), pak.offset + SIGNATURE_SIZE, pak.size, pak.segment_size);
+        info!("Pak {} - {}, offset: {}, size: {}, segment size: {}", i + 1, pak.name(), pak.offset + SIGNATURE_SIZE, pak.size, pak.segment_size);
         paks.push(Pak { offset: pak.offset + SIGNATURE_SIZE, _size: pak.size, name: pak.name() });
     }
 
@@ -82,10 +83,10 @@ pub fn extract_epk2(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
 
         //the file's header was not encrypted so we dont have the key yet
         if matching_key.is_none() {
-            println!("\nFinding key...");
+            info!("\nFinding key...");
             //find the key, knowing that the header should start with with the paks name
             if let Some((key_name, key_bytes)) = find_key(&keys::EPK, &encrypted_header, pak.name.as_bytes())? {
-                println!("Found correct key: {}", key_name);
+                info!("Found correct key: {}", key_name);
                 matching_key = Some(key_bytes);
             } else {
                 return Err("No valid key found!".into());
@@ -96,7 +97,7 @@ pub fn extract_epk2(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
         let mut pak_header_reader = Cursor::new(decrypt_aes_ecb_auto(&matching_key_bytes, &encrypted_header)?);
         let mut pak_header: PakHeader = pak_header_reader.read_le()?;
 
-        println!("\n({}/{}) - {}, Size: {}, Segment count: {}, Platform: {}",
+        info!("\n({}/{}) - {}, Size: {}, Segment count: {}, Platform: {}",
                 pak_n + 1, paks.len(), pak.name, pak_header.image_size, pak_header.segment_count, pak_header.platform_id());
 
         let output_path = Path::new(&app_ctx.output_dir).join(format!("{}.bin", pak.name));
@@ -137,14 +138,14 @@ pub fn extract_epk2(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<
                 pak_header.segment_size
             };
 
-            println!("- Segment {}/{} - Size: {}", i + 1, pak_header.segment_count, actual_segment_size);
+            info!("- Segment {}/{} - Size: {}", i + 1, pak_header.segment_count, actual_segment_size);
 
             let segment_data = common::read_exact(&mut file, actual_segment_size as usize)?;
             let out_data = decrypt_aes_ecb_auto(&matching_key_bytes, &segment_data)?;
 
             out_file.write_all(&out_data)?;
 
-            println!("-- Saved to file!");
+            info!("-- Saved to file!");
         }
     }
 

@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub struct MtkBdpContext {
     pitit_offset: u64,
@@ -34,10 +35,10 @@ pub fn is_mtk_bdp_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box
 
 pub fn extract_mtk_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<MtkBdpContext>().expect("Missing context");
+    let ctx = ctx.downcast::<MtkBdpContext>().map_err(|_| "Invalid context type")?;
 
     let offset = ctx.pitit_offset;
-    println!("\nReading PITIT at: {}", offset);
+    info!("\nReading PITIT at: {}", offset);
 
     file.seek(SeekFrom::Start(offset + 8))?;
 
@@ -53,11 +54,11 @@ pub fn extract_mtk_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
         if pitit_ver == 1 {
             //old PITIT does not have BIT entry, because BIT appears directly after PITIT
             let pitit_bit_entry: PITITBITEntry = file.read_le()?;
-            println!("PITIT Entry - NAND Size: {}, PIT Offset: {}, PIT Size: {}, BIT Offset: {}, BIT Size: {}",
+            info!("PITIT Entry - NAND Size: {}, PIT Offset: {}, PIT Size: {}, BIT Offset: {}, BIT Size: {}",
                     pitit_pit_entry.nand_size, pitit_pit_entry.pit_offset, pitit_pit_entry.pit_size, pitit_bit_entry.bit_offset, pitit_bit_entry.bit_size);
             if bit_offset == 0 { bit_offset = pitit_bit_entry.bit_offset as u64 } //use the first entry in PITIT
         } else {
-            println!("PITIT Entry - NAND Size: {}, PIT Offset: {}, PIT Size: {}",
+            info!("PITIT Entry - NAND Size: {}, PIT Offset: {}, PIT Size: {}",
                     pitit_pit_entry.nand_size, pitit_pit_entry.pit_offset, pitit_pit_entry.pit_size);
         }
         if pit_offset == 0 { pit_offset = pitit_pit_entry.pit_offset as u64 } //use the first entry in PITIT
@@ -67,24 +68,24 @@ pub fn extract_mtk_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
         bit_offset = file.stream_position()?;
     }
 
-    println!("\nReading PIT at: {}", pit_offset); //PIT is the NAND partition table.
+    info!("\nReading PIT at: {}", pit_offset); //PIT is the NAND partition table.
     file.seek(SeekFrom::Start(pit_offset))?;
     let mut pit_entries: Vec<PITEntry> = Vec::new();
     let pit_header: PITHeader = file.read_le()?;
     if pit_header.pit_magic != PIT_MAGIC {
         return Err("Invalid PIT magic!".into());
     }
-    println!("PIT Info - First entry offs: {}, Entry size: {}, Entry count: {}", pit_header.first_entry_offset, pit_header.entry_size, pit_header.entry_count);
+    info!("PIT Info - First entry offs: {}, Entry size: {}, Entry count: {}", pit_header.first_entry_offset, pit_header.entry_size, pit_header.entry_count);
     file.seek(SeekFrom::Start(pit_offset + pit_header.first_entry_offset as u64))?;
 
     for i in 0..pit_header.entry_count {
         let pit_entry: PITEntry = file.read_le()?;
-        println!("{}. ID: {:02x}, Name: {}, NAND Offset: {}, NAND Size: {}",
+        info!("{}. ID: {:02x}, Name: {}, NAND Offset: {}, NAND Size: {}",
                 i + 1, pit_entry.partition_id, pit_entry.name(), pit_entry.offset_on_nand, pit_entry.size_on_nand);
         pit_entries.push(pit_entry);
     }
 
-    println!("\nReading BIT at: {}", bit_offset); //BIT is the table of objects present in the update file.
+    info!("\nReading BIT at: {}", bit_offset); //BIT is the table of objects present in the update file.
     file.seek(SeekFrom::Start(bit_offset))?;
     let mut bit_entries: Vec<BITEntry> = Vec::new();
     let bit_magic = common::read_exact(&mut file, 20)?;
@@ -96,7 +97,7 @@ pub fn extract_mtk_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
     loop {
         let bit_entry: BITEntry = file.read_le()?;
         if bit_entry.partition_id == BIT_END_MARKER {break};
-        println!("{}. ID: {:02x}, Offset: {}, Size: {}, Offset in part: {}",
+        info!("{}. ID: {:02x}, Offset: {}, Size: {}, Offset in part: {}",
                 bit_i + 1, bit_entry.partition_id, bit_entry.offset, bit_entry.size, bit_entry.offset_in_target_part);
         bit_entries.push(bit_entry);
         bit_i += 1;
@@ -112,7 +113,7 @@ pub fn extract_mtk_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
             }
         }
 
-        println!("\n({}/{}) - {}, Offset: {}, Size: {}, Offset in partition: {}",
+        info!("\n({}/{}) - {}, Offset: {}, Size: {}, Offset in partition: {}",
                 i + 1, bit_entries.len(), name, bit_entry.offset, bit_entry.size, bit_entry.offset_in_target_part);
 
         let data = common::read_file(&file, bit_entry.offset as u64, bit_entry.size as usize)?;
@@ -123,7 +124,7 @@ pub fn extract_mtk_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
         out_file.seek(SeekFrom::Start(bit_entry.offset_in_target_part as u64))?;
         out_file.write_all(&data)?;
 
-        println!("-- Saved file!");
+        info!("-- Saved file!");
     }
     
     Ok(())

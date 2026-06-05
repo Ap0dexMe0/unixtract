@@ -12,6 +12,7 @@ use crate::utils::common;
 use include::*;
 use crate::keys;
 use funai_des::funai_des_decrypt;
+use log::info;
 
 pub fn is_funai_upg_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -30,7 +31,7 @@ pub fn extract_funai_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(),
     let header: Header = file.read_le()?;
     let mut key: Option<u32> = None;
 
-    println!("File info:\nFile size: {}\nEntry count: {}", header.file_size, header.entry_count);
+    info!("File info:\nFile size: {}\nEntry count: {}", header.file_size, header.entry_count);
     
     for i in 0..header.entry_count {
         let entry: Entry = file.read_le()?;
@@ -47,7 +48,7 @@ pub fn extract_funai_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(),
                 let decrypted = funai_des_decrypt(&data, key_u32);
 
                 if is_valid_ver_string(&decrypted) {
-                    println!("Matched key: {}\nFirmware info: {}", 
+                    info!("Matched key: {}\nFirmware info: {}", 
                             key_hex, common::string_from_bytes(&decrypted));
                     key = Some(key_u32);
                     break
@@ -55,14 +56,14 @@ pub fn extract_funai_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(),
             }
         }
 
-        println!("\n({}/{}) - Type: {}, Size: {}", i + 1, header.entry_count, entry.entry_type, entry.entry_size);
+        info!("\n({}/{}) - Type: {}, Size: {}", i + 1, header.entry_count, entry.entry_type, entry.entry_size);
 
         if entry.encryption_flag == 1 {
             if let Some(key_u32) = key {
-                println!("- Decrypting...");
+                info!("- Decrypting...");
                 data = funai_des_decrypt(&data, key_u32);
             } else {
-                println!("- Warning! Failed to find decryption key, saving encrypted data")
+                info!("- Warning! Failed to find decryption key, saving encrypted data")
             }
         }
 
@@ -72,7 +73,7 @@ pub fn extract_funai_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(),
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
         out_file.write_all(&data)?;
 
-        println!("-- Saved file!");
+        info!("-- Saved file!");
     }
     
     Ok(())

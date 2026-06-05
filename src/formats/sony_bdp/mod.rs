@@ -12,6 +12,7 @@ use crate::utils::common;
 use crate::formats;
 use crate::keys;
 use include::*;
+use log::info;
 
 struct SonyBdpCtx {
     encryption_type: EncryptionType,
@@ -50,7 +51,7 @@ pub fn is_sony_bdp_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Bo
 
 pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<SonyBdpCtx>().expect("Missing context");
+    let ctx = ctx.downcast::<SonyBdpCtx>().map_err(|_| "Invalid context type")?;
 
     //need to decrypt entire file of new aes enc
     let mut enc_data = Vec::new();
@@ -58,11 +59,11 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
 
     let dec_data = match ctx.encryption_type {
         EncryptionType::HexSubst => {
-            println!("Decrypting with hex substitution...");
+            info!("Decrypting with hex substitution...");
             hex_substitute(&enc_data)
         },
         EncryptionType::AesOfb((key, iv, key_name)) => {
-            println!("Decrypting with AES key: {}...", key_name);
+            info!("Decrypting with AES key: {}...", key_name);
             ver_up_decrypt_aes128ofb(&key, &iv, &enc_data)
         }
     };
@@ -72,7 +73,7 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
     let mut hdr_reader = Cursor::new(header);
     let hdr: Header = hdr_reader.read_le()?;
 
-    println!("File info:\nFirmware: {}\nVersion: {}\nDate: {}\nFile size: {}", 
+    info!("File info:\nFirmware: {}\nVersion: {}\nDate: {}\nFile size: {}", 
             hdr.firmware_name(), hdr.firmware_version(), hdr.date(), hdr.file_size);
 
     let mut last_file_path: Option<PathBuf> = None;
@@ -89,7 +90,7 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
             continue
         }
 
-        println!("\n#{} - Offset: {}, Size: {}", i, entry.offset, entry.size);
+        info!("\n#{} - Offset: {}, Size: {}", i, entry.offset, entry.size);
         if i == 0 {
             first_entry_offset = entry.offset as u64;
         }
@@ -104,7 +105,7 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;          
         out_file.write_all(&data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
         i += 1;
     }
 
@@ -119,13 +120,14 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
             options: app_ctx.options.clone(),
             dry_run: app_ctx.dry_run,
             quiet: app_ctx.quiet,
+            verbose: app_ctx.verbose,
         };
 
         if let Some(result) = formats::mtk_bdp::is_mtk_bdp_file(&ctx)? {
-            println!("- MTK BDP file detected!\n");
+            info!("- MTK BDP file detected!\n");
             formats::mtk_bdp::extract_mtk_bdp(&ctx, result)?;
         } else {
-            println!("- Not an MTK BDP file.");    
+            info!("- Not an MTK BDP file.");    
         }
     }
      

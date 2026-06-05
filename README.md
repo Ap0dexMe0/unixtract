@@ -1,10 +1,14 @@
 # unixtract
 Extractor for various file formats.   
+This project is a fork of [theubusu/unixtract](https://github.com/theubusu/unixtract), adding extra features and improvements.   
 This is a tool that is able to extract the contents of various firmware package formats, mostly from TVs and AV devices.   
 Built in Rust, and made to not depend on any external dependancies, only Rust crates. This way it can work on Windows, Linux and MacOS and even Android.   
 Please note that this project is still under active development and errors may occur. Feel free to make an issue in that case, or if you have any feature request.   
-   
+     
 **PLEASE NOTE** - this program is NOT, and will never be designed for re-packing the extracted files!
+
+## About this fork
+This fork extends the upstream project with additional features and bug fixes. For the original README and format support details, see the [upstream repository](https://github.com/theubusu/unixtract).
 
 # Installation
 You can download the latest auto build for Windows and Linux x86-64 from [here](https://nightly.link/theubusu/unixtract/workflows/rust/main).   
@@ -15,9 +19,10 @@ Or, build from source, by downloading the code or cloning the respository and ru
 Arguments:   
 `<INPUT_TARGET>` - The target to analyze/extract.  
 `[OUTPUT_FOLDER]` - Folder to save extracted files to.  
-If an output folder is not provided, extracted files will be saved in folder `_<INPUT_TARGET>`.   
+If an output folder is not provided, extracted files will be saved in folder `_<INPUT_TARGET>`.  
 Options:  
 `-o, --options <OPTIONS>` - Format specific or global(for all formats that implement it) options, see the list below for format specific options. You can use this multiple times to activate multiple options.    
+
 ## Global options
 `dump_dec_hdrs` - For formats with an encrypted header - dump the decrypted header(s).    
 
@@ -121,6 +126,7 @@ Tip: if you have split ROM (.ROM-00 and .ROM-01), extract both into the same fol
 ## MediaTek PKG (New)
 **Used in:** Newer MediaTek-based TVs (TCL, Hisense, Sony, Philips, CVT...)  
 **Notes:** **Depends on keys** - see keys.rs (Keys for Philips and Sony included)  
+**Thanks to:** https://github.com/theubusu/mtkdec   
 **Options:**   
 `mtk_pkg:no_del_comp` - Don't delete LZHS compressed partition file after decompressing.      
 ※ Support `dump_dec_hdrs` option
@@ -128,14 +134,6 @@ Tip: if you have split ROM (.ROM-00 and .ROM-01), extract both into the same fol
 ## MediaTek PKG (Old)
 **Used in:** Older MediaTek-based TVs (Philips, Sony, Hisense...)  
 **Notes:** All files should be supported, decryption + decompression   
-**Options:**   
-`mtk_pkg:no_del_comp` - Don't delete LZHS compressed partition file after decompressing.      
-※ Support `dump_dec_hdrs` option
-
-## MediaTek PKG
-**Used in:** MediaTek-based TVs (Sony, Philips, Panasonic, Sharp...)  
-**Notes:** All files should be supported, decryption + decompression, however some Philips files use custom keys - most are included some could be missing  
-**Thanks to:** https://github.com/openlgtv/epk2extract   
 **Options:**   
 `mtk_pkg:no_del_comp` - Don't delete LZHS compressed partition file after decompressing.      
 ※ Support `dump_dec_hdrs` option
@@ -204,16 +202,16 @@ Tip: if you have split ROM (.ROM-00 and .ROM-01), extract both into the same fol
 
 ## SDDL.SEC
 **Used in:** Panasonic TVs  
-**Notes:** None, all files should be supported.  
+**Notes:** None, all files should be supported.
 **Options:**   
 `sddl_sec:save_extra` - Save SDIT.FDI and .TXT files that are not extracted by default.   
 `sddl_sec:split_peaks` - Split PEAKS module into partitions (only on older files). This will also automatically decompress compressed partitions.   
-`sddl_sec:no_decomp_peaks` - Do not automatically decompress partitions when splitting PEAKS with above option.  
+`sddl_sec:no_decomp_peaks` - Do not automatically decompress partitions when splitting PEAKS with above option.   
 **Base:** https://github.com/theubusu/sddl_dec
 
 ## SDImage (SDImage.bin)
 **Used in:** Some 2010 USA Panasonic TVs  
-**Notes:** Decryption is not yet supported.  
+**Notes:** Decryption is not yet supported.
 
 ## SLP
 **Used in:** Samsung Tizen-based NX series cameras  

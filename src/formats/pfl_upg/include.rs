@@ -39,11 +39,11 @@ pub struct Header {
     _magic_bytes: [u8; 8],
     pub header_size: u32,   //data start
     pub data_size: u32,
-        _crc32: u32,
-        pub mask: u32,
-        _data_size_decompressed: u32,
-        _padding2: u32,
-        description_bytes: [u8; 512],
+    _crc32: u32,
+    pub mask: u32,
+    _data_size_decompressed: u32,
+    _padding2: u32,
+    description_bytes: [u8; 512],
 }
 impl Header {
     pub fn description(&self) -> String {
@@ -58,8 +58,8 @@ impl Header {
 pub struct FileHeader {
     file_name_bytes: [u8; 60],
     pub real_size: u32,
-        pub stored_size: u32,
-        pub header_size: u32,
+    pub stored_size: u32,
+    pub header_size: u32,
     pub attributes: [u8; 4],
 }
 impl FileHeader {

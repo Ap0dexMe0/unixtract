@@ -52,11 +52,11 @@ pub mod gx_dvb;
 pub mod onkyo;
 pub mod philips_bdp;
 pub mod tsb_bin;
-    pub mod pup;
-    pub mod vestel;
-    pub mod novatek_raw;
+pub mod pup;
+pub mod vestel;
+pub mod novatek_raw;
 
-    pub mod msd;
+pub mod msd;
 pub mod msd10;
 pub mod msd11;
 
@@ -77,7 +77,7 @@ pub mod mtk_bdp;
 /// means that container formats (which embed other formats) must appear
 /// before their inner formats to avoid misdetection.
 pub fn get_registry() -> Vec<Format> {
-    return vec![
+    vec![
         Format {
             name: "mstar",
             detector_func: crate::formats::mstar::is_mstar_file,

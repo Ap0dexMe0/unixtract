@@ -11,6 +11,7 @@ use crate::utils::common;
 use crate::utils::aes::decrypt_aes128_ecb;
 use crate::formats::mstar::{extract_mstar, is_mstar_file};
 use include::*;
+use log::info;
 
 pub struct MstarSecureCtx {
     dec_footer: Vec<u8>,
@@ -34,14 +35,14 @@ pub fn is_mstar_secure_old_file(app_ctx: &AppContext) -> Result<Option<Box<dyn A
 
 pub fn extract_mstar_secure_old(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<MstarSecureCtx>().expect("Missing context");
+    let ctx = ctx.downcast::<MstarSecureCtx>().map_err(|_| "Invalid context type")?;
 
     let hdr: ChunkFileFooter = Cursor::new(ctx.dec_footer).read_le()?;
-    println!("Info -\nSegment size: {}\nFile data offset: {}\nFile data len: {}", hdr.segment_size, hdr.file_data_offset, hdr.file_data_len);
+    info!("Info -\nSegment size: {}\nFile data offset: {}\nFile data len: {}", hdr.segment_size, hdr.file_data_offset, hdr.file_data_len);
 
     let enc_data = common::read_file(&mut file, hdr.file_data_offset as u64, hdr.file_data_len as usize)?;
     
-    println!("- Decrypting...");
+    info!("- Decrypting...");
     let dec_data = decrypt_aes128_ecb(&MSTAR_DEFAULT_UPGRADE_KEY, &enc_data)?;
 
     let output_path = Path::new(&app_ctx.output_dir).join("_decrypted.bin");
@@ -57,6 +58,7 @@ pub fn extract_mstar_secure_old(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Resu
         options: app_ctx.options.clone(),
         dry_run: app_ctx.dry_run,
         quiet: app_ctx.quiet,
+        verbose: app_ctx.verbose,
     };
 
     //do check just in case and extract

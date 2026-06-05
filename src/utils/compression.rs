@@ -29,7 +29,7 @@ pub fn decompress_gzip_get_filename(compressed_data: &[u8]) -> Result<(Vec<u8>, 
     let mut decoder = GzDecoder::new(compressed_data);
     
     let mut filename: Option<String> = None;
-    if let Some(filename_bytes) = decoder.header().unwrap().filename() {
+    if let Some(filename_bytes) = decoder.header().and_then(|h| h.filename()) {
         filename = Some(common::string_from_bytes(filename_bytes));
     }
 

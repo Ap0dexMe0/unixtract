@@ -3,6 +3,7 @@ use crate::utils::common;
 use std::{fs::{self, File, OpenOptions}, io::{Cursor, Seek, SeekFrom, Write}, path::{Path, PathBuf}};
 
 use crate::utils::compression::decompress_zlib;
+use log::info;
 
 pub fn split_peaks_file(path: &PathBuf, out_path: &PathBuf, do_decomp: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = File::open(path)?;
@@ -11,7 +12,7 @@ pub fn split_peaks_file(path: &PathBuf, out_path: &PathBuf, do_decomp: bool) -> 
 
     let args_bytes = common::read_file(&mut file, 0, 0x210)?;
     if !args_bytes.starts_with(b"D50 ") {
-        println!("- Splitting PEAKS is not supported on this file...");
+        info!("- Splitting PEAKS is not supported on this file...");
         return Ok(());
     }
     let args = common::string_from_bytes(&args_bytes[16..]);    
@@ -57,7 +58,7 @@ pub fn split_peaks_file(path: &PathBuf, out_path: &PathBuf, do_decomp: bool) -> 
     }
 
     let root = root.ok_or("Failed to get root partition!")?;
-    println!("Root - {}", root);
+    info!("Root - {}", root);
     let root_index = parts.iter().position(|(n, _s, _f)| n == &root).ok_or("Root partition not found in partition list!")?;
 
     let mut tsize: u64 = 0;
@@ -69,7 +70,7 @@ pub fn split_peaks_file(path: &PathBuf, out_path: &PathBuf, do_decomp: bool) -> 
             break
         }
 
-        println!("- {} - Size: {}{}", part_name, part_size, if let Some(part_flag) = part_flag {format!(", Flag: {}", part_flag)} else {format!("")});
+        info!("- {} - Size: {}{}", part_name, part_size, if let Some(part_flag) = part_flag {format!(", Flag: {}", part_flag)} else {format!("")});
 
         tsize += part_size;
 
@@ -79,7 +80,7 @@ pub fn split_peaks_file(path: &PathBuf, out_path: &PathBuf, do_decomp: bool) -> 
         let data = common::read_exact(&mut file, *part_size as usize)?;
         
         if do_decomp && let Some(part_flag) = part_flag && *part_flag == "c" {
-            println!("-- Decompressing ...");
+            info!("-- Decompressing ...");
             decompress_part_to_file(&data, &output_path)?;
             continue
         }
@@ -108,7 +109,7 @@ fn decompress_part_to_file(data: &[u8], out_path: &PathBuf) -> Result<(), Box<dy
     let first_blk: u32 = reader.read_type(endianness)?;
     let count_blks = (first_blk - 4) / 4;
 
-    println!("[INFO] Endianness: {}, Uncompressed size: {}, First block loc: {}, Block count: {}", 
+    info!("[INFO] Endianness: {}, Uncompressed size: {}, First block loc: {}, Block count: {}", 
             endianness, uncompressed_size, first_blk, count_blks);
 
     reader.seek(SeekFrom::Start(4))?;
@@ -123,9 +124,8 @@ fn decompress_part_to_file(data: &[u8], out_path: &PathBuf) -> Result<(), Box<dy
     for (n, blk) in block_locs.iter().enumerate() {
         reader.seek(SeekFrom::Start(*blk as u64))?;
 
-        print!("\rDecompressing... {}/{}", 
+        info!("Decompressing... {}/{}", 
               n + 1, count_blks);
-        std::io::stdout().flush()?;
 
         //special handling for last block since there is no next block to check, just assume 16k
         let blk_size = if n == count_blks as usize - 1 {16384} else {block_locs[n + 1] - blk};
@@ -135,8 +135,6 @@ fn decompress_part_to_file(data: &[u8], out_path: &PathBuf) -> Result<(), Box<dy
 
         out_file.write_all(&decompressed)?;
     }
-
-    println!();
 
     Ok(())
 }

@@ -1,3 +1,5 @@
+use log::info;
+
 use crate::utils::common;
 use std::{fs::{self, File, OpenOptions}, io::{Read, Write}, path::{Path, PathBuf}};
 
@@ -48,7 +50,7 @@ pub fn split_main_file(path: &PathBuf, out_path: &PathBuf) -> Result<(), Box<dyn
     }
 
     let root = root.ok_or("Failed to get root partition!")?;
-    println!("Root - {}", root);
+    info!("Root - {}", root);
     let root_index = parts.iter().position(|(n, _s)| n == &root).ok_or("Root partition not found in partition list!")?;
 
     let mut tsize: u64 = 0;
@@ -60,7 +62,7 @@ pub fn split_main_file(path: &PathBuf, out_path: &PathBuf) -> Result<(), Box<dyn
             break
         }
 
-        println!("- {} - Size: {}", part_name, part_size);
+        info!("- {} - Size: {}", part_name, part_size);
         tsize += part_size;
 
         let data = common::read_exact(&mut file, *part_size as usize)?;
@@ -76,7 +78,7 @@ pub fn split_main_file(path: &PathBuf, out_path: &PathBuf) -> Result<(), Box<dyn
     if has_swup_addon {
         let mut data = Vec::new();
         file.read_to_end(&mut data)?;
-        println!("- SWUP_ADDON - Size: {}", data.len());
+        info!("- SWUP_ADDON - Size: {}", data.len());
 
         let output_path = Path::new(&output_folder).join("SWUP_ADDON.bin");
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;

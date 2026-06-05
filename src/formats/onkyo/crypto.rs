@@ -1,6 +1,6 @@
 use super::include::ONKYO_MAGIC;
 
-pub fn ub_encrypte_block(input: &[u8], key: &[u8; 8]) -> Vec<u8> {
+pub fn ub_encrypted_block(input: &[u8], key: &[u8; 8]) -> Vec<u8> {
     let mut output = Vec::with_capacity(input.len());
     let state_counter = 0;
     let state_byte = 0;

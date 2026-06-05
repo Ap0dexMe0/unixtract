@@ -8,6 +8,7 @@ use std::io::Write;
 use crate::utils::common;
 use crate::utils::aes::decrypt_aes_ecb_auto;
 use crate::keys;
+use log::info;
 
 const NVT_PARTITIONS: [(&str, u32, u32); 16] = [
     ("spi_boot", 0x0000020, 0x00020000),
@@ -41,10 +42,6 @@ pub fn is_novatek_raw_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>,
         return Ok(Some(Box::new(())));
     }
     
-    for _ in keys::NOVATEK_RAW {
-        return Ok(Some(Box::new(())));
-    }
-    
     Ok(None)
 }
 
@@ -66,28 +63,28 @@ pub fn extract_novatek_raw(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
     let file_size = file.metadata()?.len() as usize;
     let enc_data = common::read_file(&mut file, 0, file_size)?;
     
-    println!("- File size: {} bytes", file_size);
-    println!("- Decrypting with AES-{}...", if key.len() == 16 { "128" } else { "256" });
+    info!("- File size: {} bytes", file_size);
+    info!("- Decrypting with AES-{}...", if key.len() == 16 { "128" } else { "256" });
     
     let dec_data = decrypt_aes_ecb_auto(&key, &enc_data)?;
     
-    println!("- Decryption complete");
+    info!("- Decryption complete");
     
     fs::create_dir_all(&app_ctx.output_dir)?;
     
     let output_path = Path::new(&app_ctx.output_dir).join("_decrypted.bin");
     let mut out_file = OpenOptions::new().write(true).create(true).open(&output_path)?;
     out_file.write_all(&dec_data)?;
-    println!("- Saved decrypted image to {}", output_path.display());
+    info!("- Saved decrypted image to {}", output_path.display());
     
-    println!("\nExtracting partitions:");
+    info!("\nExtracting partitions:");
     for (name, offset, size) in NVT_PARTITIONS {
         if (offset + size) as usize <= dec_data.len() && size > 0 {
             let part_data = &dec_data[offset as usize..(offset + size) as usize];
             let part_path = Path::new(&app_ctx.output_dir).join(format!("{}.bin", name));
             let mut part_file = OpenOptions::new().write(true).create(true).open(&part_path)?;
             part_file.write_all(part_data)?;
-            println!("  {}: offset=0x{:x}, size={}", name, offset, size);
+            info!("  {}: offset=0x{:x}, size={}", name, offset, size);
         }
     }
     

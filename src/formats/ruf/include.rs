@@ -5,7 +5,7 @@ use binrw::BinRead;
 pub struct RufHeader {
     _magic_bytes: [u8; 6],
     _upgrade_type_bytes: [u8; 2],
-	_unk1: u32,
+    _unk1: u32,
     date_time_bytes: [u8; 32],
     buyer_bytes: [u8; 8],
     model_bytes: [u8; 32],
@@ -33,7 +33,7 @@ impl RufHeader {
         common::string_from_bytes(&self.region_info_bytes)
     }
     pub fn is_dual_ruf(&self) -> bool {
-        if self.dual_ruf_flag == 0x44 {true} else {false}
+        self.dual_ruf_flag == 0x44
     }
 }
 
@@ -41,7 +41,7 @@ impl RufHeader {
 pub struct RufEntry {
     _metadata: [u8; 32],
     pub payload_type_bytes: u32,
-	pub size: u32,
+    pub size: u32,
     _unk1: u32,
     _unk2: [u8; 20],
 }

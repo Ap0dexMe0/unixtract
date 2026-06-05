@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 struct PhilipsBdpCtx {
     header_type: HeaderType,
@@ -31,7 +32,7 @@ pub fn is_philips_bdp_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>,
 
 pub fn extract_philips_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<PhilipsBdpCtx>().expect("Missing context");
+    let ctx = ctx.downcast::<PhilipsBdpCtx>().map_err(|_| "Invalid context type")?;
 
     let header: Box<dyn UpgHeader> = match ctx.header_type {
         HeaderType::Old => Box::new(file.read_le::<UpgHeaderOld>()?),
@@ -40,7 +41,7 @@ pub fn extract_philips_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
 
     let header_size = file.stream_position()?;
 
-    println!("File info -\nName: {}\nVersion: {}\nTarget size: {}\nEntry count: {}\nHeader type: {:?}\nHeader size: {}",
+    info!("File info -\nName: {}\nVersion: {}\nTarget size: {}\nEntry count: {}\nHeader type: {:?}\nHeader size: {}",
             header.name(), header.version(), header.target_size(), header.target_num(), ctx.header_type, header_size);
     
     for (i, entry) in header.entries().iter().enumerate() {
@@ -48,14 +49,14 @@ pub fn extract_philips_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
             break
         }
 
-        println!("\n#{} - ID: {:x}, IIC: {:x}, Version: {}, Offset: {}, Size: {}", 
+        info!("\n#{} - ID: {:x}, IIC: {:x}, Version: {}, Offset: {}, Size: {}", 
                 i+1, entry.id, entry.iic, entry.version(), entry.offset, entry.size);
 
         let data = common::read_file(&file, entry.offset as u64 + header_size, entry.size as usize)?;
 
         let out_data;
         if entry.id == 0 && app_ctx.has_option("philips_bdp:decrypt") {
-            println!("- Decrypting...");
+            info!("- Decrypting...");
             out_data = bebin_decrypt_aes256cfb(&data, &KEY1, &IV1);
         } else {
             out_data = data;
@@ -67,23 +68,23 @@ pub fn extract_philips_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<()
         let mut out_file = OpenOptions::new().write(true).create(true).open(&output_path)?;       
         out_file.write_all(&out_data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
 
         //ID 0 should be the main MTK bdp file, since this is just an extra container for that format (like Sony BDP), so we can try to extract it here.
         if entry.id == 0 {
-            println!("Checking if it's also MTK BDP...");
+            info!("Checking if it's also MTK BDP...");
 
             let new_file = File::open(&output_path)?;
-            let mtk_ctx: AppContext = AppContext { input: InputTarget::File(new_file), output_dir: app_ctx.output_dir.join("0"), options: app_ctx.options.clone(), dry_run: app_ctx.dry_run, quiet: app_ctx.quiet };
+            let mtk_ctx: AppContext = AppContext { input: InputTarget::File(new_file), output_dir: app_ctx.output_dir.join("0"), options: app_ctx.options.clone(), dry_run: app_ctx.dry_run, quiet: app_ctx.quiet, verbose: app_ctx.verbose };
 
             if let Some(result) = formats::mtk_bdp::is_mtk_bdp_file(&mtk_ctx)? {
-                println!("- MTK BDP file detected!\n");
+                info!("- MTK BDP file detected!\n");
                 formats::mtk_bdp::extract_mtk_bdp(&mtk_ctx, result)?;
             } else {
                 if app_ctx.has_option("philips_bdp:decrypt") {
-                    println!("- Not an MTK BDP file"); 
+                    info!("- Not an MTK BDP file"); 
                 } else {
-                    println!("- Not an MTK BDP file (try with decrypt?)"); 
+                    info!("- Not an MTK BDP file (try with decrypt?)"); 
                 }                   
             }
         }

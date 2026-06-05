@@ -10,6 +10,7 @@ use binrw::BinReaderExt;
 use crate::utils::common;
 use crate::utils::aes::decrypt_aes256_ecb;
 use include::*;
+use log::info;
 
 pub fn is_pfl_upg_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -32,24 +33,24 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
     let version_bytes = common::read_exact(&mut file, 28)?;
     let version = common::string_from_bytes(&version_bytes);
 
-    println!("\nVersion: {}", version);
+    info!("\nVersion: {}", version);
     if header.description() != "" { //look ugly when empty
-        println!("--- Description --- \n{}", header.description());
-        println!("-------------------");
+        info!("--- Description --- \n{}", header.description());
+        info!("-------------------");
     }
-    println!("Data size: {}", header.data_size);
+    info!("Data size: {}", header.data_size);
 
     file.seek(SeekFrom::Start(header.header_size as u64))?;
 
     let mut data;
     if header.is_encrypted() {
-        println!("\nFile is encrypted.");
+        info!("\nFile is encrypted.");
         
         //get some data as test ciphertext for key finding
         let ciphertext = common::read_file(&mut file, header.header_size as u64, 64)?;
         let aes_key;
         if let Some((key_name, key)) = try_find_key(&signature, &ciphertext)? {
-            println!("Matched pubkey: {}, AES key: {}", key_name, hex::encode(key));
+            info!("Matched pubkey: {}, AES key: {}", key_name, hex::encode(key));
             aes_key = key;
         } else {
             return Err("Matching key not found, cannot decrypt data".into());
@@ -58,7 +59,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         //need to align to 16 bytes for AES blocksize
         let encrypted_data = common::read_exact(&mut file, (header.data_size as usize + 0xf) & !0xf)?;
 
-        println!("Decrypting data...");
+        info!("Decrypting data...");
         data = decrypt_aes256_ecb(&aes_key, &encrypted_data)?;
         data.truncate(header.data_size as usize);   //discard padding 
         
@@ -76,7 +77,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         let ex_header_bytes = common::read_exact(&mut data_reader, ex_header_size as usize)?;
 
         if file_header.is_folder() {
-            println!("\nFolder - {}", file_header.file_name());
+            info!("\nFolder - {}", file_header.file_name());
             let output_path = Path::new(&app_ctx.output_dir).join(file_header.file_name().trim_start_matches('/'));
             fs::create_dir_all(output_path)?;
             continue
@@ -88,7 +89,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
             file_header.file_name()
         };
 
-        println!("\nFile - {}, Size: {}", file_name, file_header.real_size);
+        info!("\nFile - {}, Size: {}", file_name, file_header.real_size);
         let data = common::read_exact(&mut data_reader, file_header.stored_size as usize)?;
 
         let output_path = Path::new(&app_ctx.output_dir).join(file_name.trim_start_matches('/'));
@@ -100,7 +101,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
 
         //pfl upg inside pfl upg! DUMB code!
         if file_header.is_package() && !app_ctx.has_option("pfl_upg:no_extract_inner_upg"){
-            println!("- Extracting inner UPG...");
+            info!("- Extracting inner UPG...");
 
             //save this as temp file
             let temp_path = Path::new(&app_ctx.output_dir).join("inner_upg_temp");
@@ -115,6 +116,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
                 options: app_ctx.options.clone(),
                 dry_run: app_ctx.dry_run,
                 quiet: app_ctx.quiet,
+                verbose: app_ctx.verbose,
             };
 
             //do check just in case and extract
@@ -132,7 +134,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
         out_file.write_all(&data[..file_header.real_size as usize])?;
-        println!("- Saved file!");
+        info!("- Saved file!");
     }
     
     Ok(())

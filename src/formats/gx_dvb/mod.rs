@@ -8,6 +8,7 @@ use crate::AppContext;
 use crate::utils::common;
 use binrw::BinReaderExt;
 use include::*;
+use log::info;
 
 pub fn is_gx_dvb_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -26,10 +27,10 @@ pub fn extract_gx_dvb(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
     file.seek(SeekFrom::Start(TABLE_OFFSET))?;
     let table: PartTable = file.read_be()?;
 
-    println!("Part count: {}", table.part_count);
+    info!("Part count: {}", table.part_count);
 
     for (i, part) in table.part_entries.iter().enumerate() {
-        println!("\n({}/{}) - {}, Offset: {}, Total size: {}, Used size: {}",
+        info!("\n({}/{}) - {}, Offset: {}, Total size: {}, Used size: {}",
                 i+1, table.part_count, part.name(), part.start, part.total_size, part.used_size);
 
         let data = common::read_file(&file, part.start as u64, part.total_size as usize)?;
@@ -39,7 +40,7 @@ pub fn extract_gx_dvb(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;        
         out_file.write_all(&data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
     }
 
     Ok(())

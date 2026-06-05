@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub struct RvpContext {
     header_type: HeaderType,
@@ -35,11 +36,11 @@ pub fn is_rvp_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn
 
 pub fn extract_rvp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<RvpContext>().expect("Missing context");
+    let ctx = ctx.downcast::<RvpContext>().map_err(|_| "Invalid context type")?;
 
     if ctx.header_type == HeaderType::RVP {
         let header: RVPHeader = file.read_be()?;
-        println!("RVP Info -\nVersion: {}\nYear: {:x}\nForce: {}", header.version_info(), header.year, header.force);
+        info!("RVP Info -\nVersion: {}\nYear: {:x}\nForce: {}", header.version_info(), header.year, header.force);
 
     } else if ctx.header_type == HeaderType::MVP {
         file.seek(std::io::SeekFrom::Start(36))?;
@@ -47,14 +48,14 @@ pub fn extract_rvp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
 
     let mut obf_data = Vec::new();
     file.read_to_end(&mut obf_data)?;
-    println!("DeXORing data..");
+    info!("DeXORing data..");
 
     let data = decrypt_xor(&obf_data); 
     let data_size = data.len();
     let mut data_reader = Cursor::new(data);
 
     let module_count: u32 = data_reader.read_le()?;    //little endian??
-    println!("Module count: {}", module_count);
+    info!("Module count: {}", module_count);
 
     //follows table of sizes of modules, structure is static for given module
     let mut module_names: Vec<&str> = Vec::new();
@@ -82,8 +83,8 @@ pub fn extract_rvp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
         };
 
         let header_size_bytes = common::read_exact(&mut data_reader, 4)?;
-        let header_size = u32::from_be_bytes(header_size_bytes.try_into().unwrap());
-        println!("\n({}/{}) - {}, Offset: {}, Header size: {}", i+1, module_count, module_name, data_reader.position() - 4, header_size);
+        let header_size = u32::from_be_bytes(header_size_bytes.try_into().map_err(|_| "Conversion failed")?);
+        info!("\n({}/{}) - {}, Offset: {}, Header size: {}", i+1, module_count, module_name, data_reader.position() - 4, header_size);
         let hdr = common::read_exact(&mut data_reader, header_size as usize)?;
 
         let size;
@@ -93,7 +94,7 @@ pub fn extract_rvp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
             let lines: Vec<String> = hdr_string.lines().map(|l| l.trim().to_string()).collect();
 
             //BEAUTIFUL
-            println!("ModelName: {}\nFileName: {}\nModelID: {}\nNewUpdate: {}\nNewMajorVer: {}\nNewMinorVer: {}\nForcedFlag: {}\nStartAddress: {}\nJumpAddress: {}\nMagicAddress: {}\nTotalSize: {}\nTotalSum: {}\nTotalCrc: {}",
+            info!("ModelName: {}\nFileName: {}\nModelID: {}\nNewUpdate: {}\nNewMajorVer: {}\nNewMinorVer: {}\nForcedFlag: {}\nStartAddress: {}\nJumpAddress: {}\nMagicAddress: {}\nTotalSize: {}\nTotalSum: {}\nTotalCrc: {}",
                     lines[0], lines[1], lines[2], lines[3], lines[4], lines[5], lines[6], lines[7], lines[8], lines[9], lines[10], lines[11], lines[12]);
 
             size = lines[10].parse().unwrap();
@@ -116,7 +117,7 @@ pub fn extract_rvp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
             //5. - unknown - like "00011200" -- this line is not present when size is 40 but were not using it anyway so whatever
             name = lines[0].clone();
             size = u32::from_str_radix(&lines[1], 16).unwrap();
-            println!("Name: {}", name);
+            info!("Name: {}", name);
 
         } else if header_size == 16 {
             // 4 bytes CRC32
@@ -126,11 +127,11 @@ pub fn extract_rvp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
             size = u32::from_be_bytes(hdr[8..12].try_into().unwrap());
 
         } else {
-            println!("Unsupported header size!");
+            info!("Unsupported header size!");
             break
         }
 
-        println!("Size: {}", size);
+        info!("Size: {}", size);
         let data = common::read_exact(&mut data_reader, size as usize)?;
         let output_path = Path::new(&app_ctx.output_dir).join(if name=="" {format!("{}_{}.bin", i+1, module_name)} else {format!("{}_{}_{}", i+1, module_name, name)});
 
@@ -138,7 +139,7 @@ pub fn extract_rvp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;      
         out_file.write_all(&data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
     }
 
     Ok(())

@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub fn is_novatek_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -25,7 +26,7 @@ pub fn extract_novatek(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
 
     let header: Header = file.read_le()?;
-    println!("File info:\nFirmware name: {}\nVersion: {}.{}\nData size: {}\nPart count: {}",
+    info!("File info:\nFirmware name: {}\nVersion: {}.{}\nData size: {}\nPart count: {}",
             header.firmware_name(), header.version_major, header.version_minor, header.data_size, header.part_count);
 
     let mut entries: Vec<PartEntry> = Vec::new();
@@ -37,7 +38,7 @@ pub fn extract_novatek(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
     let mut e_i = 0;
     for entry in &entries {
         e_i += 1;
-        println!("\n({}/{}) - ID: {}, Offset: {}, Size: {}", e_i, entries.len(), entry.id, entry.offset, entry.size);
+        info!("\n({}/{}) - ID: {}, Offset: {}, Size: {}", e_i, entries.len(), entry.id, entry.offset, entry.size);
 
         let data = common::read_file(&file, entry.offset as u64, entry.size as usize)?;
 
@@ -47,7 +48,7 @@ pub fn extract_novatek(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;       
         out_file.write_all(&data)?;
 
-        println!("- Saved file!");
+        info!("- Saved file!");
     }
 
     Ok(())

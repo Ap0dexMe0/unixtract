@@ -15,6 +15,7 @@ use crate::utils::aes::{decrypt_aes128_cbc_nopad};
 use crate::keys;
 use lzhs::{decompress_mtk_to_file};
 use include::*;
+use log::{info, warn};
 
 pub struct MtkPkgContext {
     is_philips_variant: bool,
@@ -43,7 +44,7 @@ pub fn is_mtk_pkg_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box
 
 pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
-    let ctx = ctx.downcast::<MtkPkgContext>().expect("Missing context");
+    let ctx = ctx.downcast::<MtkPkgContext>().map_err(|_| "Invalid context type")?;
 
     let file_size = file.metadata()?.len();
     let header = ctx.decrypted_header;
@@ -52,7 +53,7 @@ pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
     let mut hdr_reader = Cursor::new(header); 
     let hdr: Header = hdr_reader.read_le()?;
 
-    println!("File info:\nFile size: {}\nVendor magic: {}\nVersion info: {}\nProduct name: {}" , 
+    info!("File info:\nFile size: {}\nVendor magic: {}\nVersion info: {}\nProduct name: {}" , 
             hdr.file_size, hdr.vendor_magic(), hdr.version(), hdr.product_name());
 
     if ctx.is_philips_variant {
@@ -67,13 +68,13 @@ pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
         let part_entry: PartEntry = file.read_le()?;
         if !part_entry.is_valid() {break};
 
-        println!("\n#{} - {}, Size: {}{} {}", 
+        info!("\n#{} - {}, Size: {}{} {}", 
                 part_n, part_entry.name(), part_entry.size, if part_entry.is_compressed() {" [COMPRESSED]"} else {""}, if part_entry.is_encrypted() {"[ENCRYPTED]"} else {""} );
 
         let data = common::read_exact(&mut file, part_entry.size as usize + CRYPTED_HEADER_SIZE)?;
         
         if part_entry.size == 0 {
-            println!("- Empty entry, skipping!");
+            info!("- Empty entry, skipping!");
             continue
         }
 
@@ -91,7 +92,7 @@ pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
             }
             let try_decrypt = decrypt_aes128_cbc_nopad(&crypted_header, &key, &HEADER_IV)?;
             if try_decrypt.starts_with(MTK_RESERVED_MAGIC) {
-                println!("- Decrypting with 4xVendor magic...");
+                info!("- Decrypting with 4xVendor magic...");
                 matching_key = Some(key);
                 matching_iv = Some(HEADER_IV);
 
@@ -103,7 +104,7 @@ pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
                     let try_decrypt = decrypt_aes128_cbc_nopad(&crypted_header, &key_array, &iv_array)?;
 
                     if try_decrypt.starts_with(MTK_RESERVED_MAGIC) {
-                        println!("- Decrypting with key {}...", name);
+                        info!("- Decrypting with key {}...", name);
                         matching_key = Some(key_array);
                         matching_iv = Some(iv_array);
                         break
@@ -121,7 +122,7 @@ pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
                     out_data.push(b ^ key_array[i % key_array.len()]);
                 }
             } else {
-                println!("- Failed to decrypt data!");
+                info!("- Failed to decrypt data!");
                 continue
             }
         } else {
@@ -134,7 +135,7 @@ pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
             if imtk_len != 0 && &out_data[56..60] != MTK_META_PAD_MAGIC {
                 let version_len = u32::from_le_bytes(out_data[56..60].try_into().unwrap());
                 let version = common::string_from_bytes(&out_data[60..60 + version_len as usize]);
-                println!("- Version: {}", version);
+                info!("- Version: {}", version);
             }
             imtk_len + 8
         } else {
@@ -148,18 +149,18 @@ pub fn extract_mtk_pkg(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
         if part_entry.is_compressed() {
             match decompress_mtk_to_file(&fin_data, &output_path) {
                 Ok(()) => {
-                    println!("-- Decompressed Successfully, Saved file!");
+                    info!("-- Decompressed Successfully, Saved file!");
                     continue
                 },
                 Err(e) => {
-                    eprintln!("Failed to decompress partition!, Error: {}. Saving compressed data...", e);
+                    warn!("Failed to decompress partition!, Error: {}. Saving compressed data...", e);
                 }
             }
         }
 
         let mut out_file = OpenOptions::new().write(true).create(true).open(&output_path)?;
         out_file.write_all(&fin_data)?;
-        println!("-- Saved file!");
+        info!("-- Saved file!");
 
     }
 

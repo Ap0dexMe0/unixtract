@@ -1,3 +1,5 @@
+use log::info;
+
 mod include;
 mod android_ota_update_metadata;
 use std::any::Any;
@@ -29,7 +31,7 @@ pub fn extract_android_ota_payload(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> 
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
 
     let header: Header = file.read_be()?;
-    println!("File info:\nFormat version: {}\nManifest size: {}", header.file_format_version, header.manifest_size);
+    info!("File info:\nFormat version: {}\nManifest size: {}", header.file_format_version, header.manifest_size);
 
     if header.file_format_version != 2 {
         return Err("Unsupported format version! (Only 2 is supported right now)".into());
@@ -42,7 +44,7 @@ pub fn extract_android_ota_payload(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> 
 
     for (i, partition) in manifest.partitions.into_iter().enumerate() {
         let operation_count = partition.operations.len();
-        println!("\n#{} - {}, Size: {}, Operations: {}", 
+        info!("\n#{} - {}, Size: {}, Operations: {}", 
                 i + 1, partition.partition_name, partition.new_partition_info.unwrap().size.unwrap(), operation_count);
 
         fs::create_dir_all(&app_ctx.output_dir)?;
@@ -60,9 +62,8 @@ pub fn extract_android_ota_payload(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> 
 
             //because the amount of operations can reach up to the thousands, i think its best to update the current line
             //to not clog up the terminal and so you know what the program is actually doing
-            print!("\r- ({}/{}) - {}({}), Offset: {}, Size: {}", 
+            info!("- ({}/{}) - {}({}), Offset: {}, Size: {}", 
                     i + 1, operation_count, operation_name_str, operation.r#type, offset, size);
-            std::io::stdout().flush()?;
 
             let data = common::read_file(&file, offset, size as usize)?;
 
@@ -76,13 +77,13 @@ pub fn extract_android_ota_payload(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> 
             else if operation.r#type == 8 { //REPLACE_XZ - decompress with xz and write
                 out_data = decompress_xz(&data)?;
             } else {
-                println!("-- Unsupported operation!");
+                info!("-- Unsupported operation!");
                 break
             }
 
             out_file.write_all(&out_data)?;
         }
-        println!("\n-- Saved!");
+        info!("\n-- Saved!");
     }
 
     Ok(())

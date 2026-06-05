@@ -1,6 +1,7 @@
 use std::{fs::{self, OpenOptions}, io::Write, path::Path};
 
 use crate::AppContext;
+use log::info;
 
 pub fn opt_dump_dec_hdr(app_ctx: &AppContext, data: &[u8], name: &str) -> Result<(), Box<dyn std::error::Error>> {
     if !app_ctx.has_option("dump_dec_hdrs") {
@@ -14,7 +15,7 @@ pub fn opt_dump_dec_hdr(app_ctx: &AppContext, data: &[u8], name: &str) -> Result
     let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;
     out_file.write_all(&data)?;
         
-    println!("[i] Saved {} to {}", name, filename);
+    info!("[i] Saved {} to {}", name, filename);
 
     Ok(())
 }

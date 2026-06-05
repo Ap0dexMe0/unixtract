@@ -5,7 +5,7 @@ use crate::AppContext;
 use std::fs;
 use std::path::{Path};
 use std::fs::{File, OpenOptions};
-use std::io::{Write};
+use std::io::Write;
 use hex::decode;
 use sha1::{Digest, Sha1};
 use md5;
@@ -14,11 +14,12 @@ use crate::utils::common;
 use crate::keys;
 use crate::utils::aes::{decrypt_aes128_cbc_pcks7};
 use include::decrypt_xor;
+use log::info;
 
 pub fn is_samsung_old_dir(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let dir = match app_ctx.dir() {Some(d) => d, None => return Ok(None)};
 
-    if Path::new(&dir).join("image").is_dir() & Path::new(&dir).join("image/info.txt").exists(){
+    if Path::new(&dir).join("image").is_dir() && Path::new(&dir).join("image/info.txt").exists(){
         Ok(Some(Box::new(())))
     } else {
         Ok(None)
@@ -29,7 +30,7 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
     let path = app_ctx.dir().ok_or("Extractor expected directory")?;
 
     let fw_info = fs::read_to_string(Path::new(&path).join("image/info.txt"))?;
-    println!("Firmware info: {}", fw_info);
+    info!("Firmware info: {}", fw_info);
 
     let image_path = Path::new(&path).join("image");
 
@@ -43,7 +44,7 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
         }
     }
     if let Some(p) = secret {
-        println!("Secret: {}", p);
+        info!("Secret: {}", p);
     } else {
         return Err("This firmware is not supported!".into());
     }
@@ -58,7 +59,7 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
                     let file = File::open(&path)?;
                     let filename = path.file_name().unwrap().to_str().unwrap();
                     let file_size = file.metadata()?.len();
-                    println!("\nFile - {}", filename);
+                    info!("\nFile - {}", filename);
 
                     let data = common::read_file(&file, 0, file_size.try_into().unwrap())?;
                     let salt = &data[8..16];
@@ -103,10 +104,10 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
                     }
 
                     let end = file_size - 260;
-                    println!("- Decrypting file...");
+                    info!("- Decrypting file...");
                     let decrypted_data = decrypt_aes128_cbc_pcks7(&data[16..end.try_into().unwrap()], &key_md5, &iv_md5)?;
 
-                    println!("-- DeXORing file...");
+                    info!("-- DeXORing file...");
                     let xor_key = fw_info.split_whitespace().next().unwrap();
                     let out_data = decrypt_xor(&decrypted_data, xor_key);
                     
@@ -120,7 +121,7 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
 
                     out_file.write_all(&out_data)?;
 
-                    println!("--- Saved file!");
+                    info!("--- Saved file!");
                 }
             }
         }

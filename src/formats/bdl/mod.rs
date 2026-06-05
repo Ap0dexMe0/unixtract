@@ -9,6 +9,7 @@ use binrw::BinReaderExt;
 
 use crate::utils::common;
 use include::*;
+use log::info;
 
 pub fn is_bdl_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -26,7 +27,7 @@ pub fn extract_bdl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
 
     let header: BdlHeader = file.read_le()?;
 
-    println!("File info:\nPackage count: {}\nDate: {}\nManufacturer: {}\nModel: {}\nVersion: {}\nInfo: {}",
+    info!("File info:\nPackage count: {}\nDate: {}\nManufacturer: {}\nModel: {}\nVersion: {}\nInfo: {}",
                 header.pkg_count, header.date(), header.manufacturer(), header.model(), header.version(), header.info());
 
     let mut pkgs: Vec<PkgListEntry> = Vec::new();
@@ -39,7 +40,7 @@ pub fn extract_bdl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
     for (i, pkg) in pkgs.iter().enumerate() {
         file.seek(SeekFrom::Start(pkg.offset))?;
         let pkg_header: PkgHeader = file.read_le()?;
-        println!("\nPackage ({}/{}) - Name: {}, Version: {}, Entry Count: {}, Manufacturer: {}, Offset: {}, Size: {}", 
+        info!("\nPackage ({}/{}) - Name: {}, Version: {}, Entry Count: {}, Manufacturer: {}, Offset: {}, Size: {}", 
                 i + 1, header.pkg_count, pkg_header.name(), pkg_header.version(), pkg_header.entry_count, pkg_header.manufacturer(), pkg.offset, pkg.size);
 
         let mut pkg_entries: Vec<PkgEntry> = Vec::new();
@@ -53,7 +54,7 @@ pub fn extract_bdl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
         fs::create_dir_all(&pkg_folder)?;
 
         for (i, pkg_entry) in pkg_entries.iter().enumerate() {
-            println!("- Entry {}/{} - Name: {}, Offset: {}, Size: {}", 
+            info!("- Entry {}/{} - Name: {}, Offset: {}, Size: {}", 
                     i + 1, pkg_header.entry_count, pkg_entry.name(), pkg_entry.offset, pkg_entry.size);
 
             let calc_offset = pkg.offset + pkg_entry.offset; 
@@ -64,7 +65,7 @@ pub fn extract_bdl(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
             
             out_file.write_all(&data)?;
 
-            println!("-- Saved file!");
+            info!("-- Saved file!");
 
         }
     }

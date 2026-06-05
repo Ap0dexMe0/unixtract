@@ -10,6 +10,7 @@ use std::io::{Write, Seek, SeekFrom};
 use crate::utils::common;
 use crate::utils::compression::{decompress_zlib};
 use include::*;
+use log::info;
 
 pub fn is_pup_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -26,7 +27,7 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
 
     let header: Header = file.read_le()?;
-    println!("File info:\nFile size: {}\nEntry count: {}",
+    info!("File info:\nFile size: {}\nEntry count: {}",
             header.file_size, header.entry_count);
 
     let mut entries: Vec<Entry> = Vec::new();
@@ -42,7 +43,7 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
 
     let mut e_i = 0;
     for entry in &entries {
-        println!("\n({}/{}) - ID: {} Offset: {}, Compressed Size: {}, Uncompressed Size: {}\nCompressed: {}, Blocked: {}, Block table: {}",
+        info!("\n({}/{}) - ID: {} Offset: {}, Compressed Size: {}, Uncompressed Size: {}\nCompressed: {}, Blocked: {}, Block table: {}",
             e_i + 1, entries.len(), entry.id(), entry.offset, entry.compressed_size, entry.uncompressed_size, entry.is_compressed(), entry.is_blocked(), entry.is_block_table());
 
         if !entry.is_block_table () {
@@ -51,17 +52,17 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
             let block_count = (block_size + entry.uncompressed_size as u32 - 1) / block_size;
             let last_block_size = entry.uncompressed_size % block_size as u64;
             let mut my_block_table: Option<Entry> = None;
-            println!("Block size: {}, Block count: {}", block_size, block_count);
+            info!("Block size: {}, Block count: {}", block_size, block_count);
 
             for block_table in &block_tables {
                 if block_table.id() == e_i {
                     my_block_table = Some(block_table.clone());
-                    println!("Found block table: Offset: {}, Size: {}", block_table.offset, block_table.compressed_size);
+                    info!("Found block table: Offset: {}, Size: {}", block_table.offset, block_table.compressed_size);
                     break
                 }
             }
             if my_block_table.is_none() {
-                println!("Failed to find block table!");
+                info!("Failed to find block table!");
                 continue
             }
 
@@ -84,13 +85,13 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
                 let ac_block_size = if i == block_count - 1 {last_block_size as u32} else {block_size};
 
                 let compressed = if data_size == ac_block_size {false} else {true};
-                println!("Block {}/{}: Offset: {}, Data Size: {}, Padding: {}, Compressed: {}", i + 1, block_count, block.offset, data_size, padding, compressed);
+                info!("Block {}/{}: Offset: {}, Data Size: {}, Padding: {}, Compressed: {}", i + 1, block_count, block.offset, data_size, padding, compressed);
 
                 file.seek(std::io::SeekFrom::Start(initial_offset + block.offset as u64))?;
                 let out_data;
                 let data = common::read_exact(&mut file, data_size as usize)?;
                 if compressed {
-                    println!("- Decompressing...");
+                    info!("- Decompressing...");
                     out_data = decompress_zlib(&data)?;
                 } else {
                     out_data = data;
@@ -102,7 +103,7 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
                 let mut out_file = OpenOptions::new().append(true).create(true).open(output_path)?;       
                 out_file.write_all(&out_data)?;
 
-                println!("-- Saved!");
+                info!("-- Saved!");
 
                 file.seek(std::io::SeekFrom::Start(current_pos))?;
             }
@@ -112,7 +113,7 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
             let out_data;
 
             if entry.is_compressed() {
-                println!("- Decompressing...");
+                info!("- Decompressing...");
                 out_data = decompress_zlib(&data)?;
             } else {
                 out_data = data;
@@ -124,10 +125,10 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
             let mut out_file = OpenOptions::new().write(true).create(true).open(output_path)?;        
             out_file.write_all(&out_data)?;
 
-            println!("-- Saved file!");
+            info!("-- Saved file!");
         }
         } else {
-            println!("- Skipping block table..")
+            info!("- Skipping block table..")
         }
         e_i += 1;
 

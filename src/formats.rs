@@ -54,6 +54,7 @@ pub mod philips_bdp;
 pub mod tsb_bin;
     pub mod pup;
     pub mod vestel;
+    pub mod novatek_raw;
 
     pub mod msd;
 pub mod msd10;
@@ -281,5 +282,11 @@ pub fn get_registry() -> Vec<Format> {
             name: "vestel",
             detector_func: crate::formats::vestel::is_vestel_file,
             extractor_func: crate::formats::vestel::extract_vestel,
-        },    ]
+        },
+        Format {
+            name: "novatek_raw",
+            detector_func: crate::formats::novatek_raw::is_novatek_raw_file,
+            extractor_func: crate::formats::novatek_raw::extract_novatek_raw,
+        },
+    ]
 }

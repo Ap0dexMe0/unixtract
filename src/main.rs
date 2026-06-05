@@ -20,8 +20,8 @@ use crate::error::UnixtractError;
                   with built-in decryption and decompression capabilities."
 )]
 struct Args {
-/// The target file or directory to analyze/extract
-    #[arg(required_unless_present = "list-formats")]
+    /// The target file or directory to analyze/extract
+    #[arg(required_unless_present = "list_formats")]
     input_target: Option<String>,
 
     /// Folder to save extracted files to (default: _<INPUT_TARGET>)

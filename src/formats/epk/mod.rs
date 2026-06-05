@@ -9,6 +9,7 @@ use log::info;
 
 pub struct EpkContext {
     epk_version: u8,
+    versions: Vec<u8>,
 }
 
 pub fn is_epk_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
@@ -16,7 +17,7 @@ pub fn is_epk_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn
 
     let versions = common::read_file(&file, 1712, 36)?;
     if let Some(epk_version) = check_epk_version(&versions) {
-        Ok(Some(Box::new(EpkContext {epk_version})))
+        Ok(Some(Box::new(EpkContext {epk_version, versions})))
     } else {
         Ok(None)
     }
@@ -58,10 +59,8 @@ pub fn extract_epk(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dy
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
     let ctx = ctx.downcast::<EpkContext>().map_err(|_| "Invalid context type")?;
 
-    let versions = common::read_file(&file, 1712, 36)?;
-
-    let platform_version = common::string_from_bytes(&versions[4..20]);
-    let sdk_version = common::string_from_bytes(&versions[20..36]);
+    let platform_version = common::string_from_bytes(&ctx.versions[4..20]);
+    let sdk_version = common::string_from_bytes(&ctx.versions[20..36]);
     info!("Platform version: {}\nSDK version: {}", platform_version, sdk_version);
 
     file.seek(std::io::SeekFrom::Start(0))?;

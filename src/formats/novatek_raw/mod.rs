@@ -1,14 +1,16 @@
 use std::any::Any;
-use crate::AppContext;
-
-use std::path::Path;
 use std::fs::{self, OpenOptions};
 use std::io::Write;
+use std::path::Path;
 
-use crate::utils::common;
+use crate::AppContext;
 use crate::utils::aes::decrypt_aes_ecb_auto;
+use crate::utils::common;
 use crate::keys;
-use log::info;
+use log::{info, warn};
+
+// shredder format detectordecryptor
+// Detects files starting with bsl magic and attempts XOR/AES-ECB decryption
 
 const NVT_PARTITIONS: [(&str, u32, u32); 16] = [
     ("spi_boot", 0x0000020, 0x00020000),
@@ -29,13 +31,21 @@ const NVT_PARTITIONS: [(&str, u32, u32); 16] = [
     ("nand_xboot", 0x0000000, 0x0000000),
 ];
 
+const SHREDDER_MAGIC: &[u8] = b"bsl";
+
 pub fn is_novatek_raw_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
     
     let file_size = file.metadata()?.len();
     
-    if file_size < 0x10000 {
+    if file_size < SHREDDER_MAGIC.len() as u64 {
         return Ok(None);
+    }
+    
+    let magic = common::read_file(&file, 0, SHREDDER_MAGIC.len())?;
+    if magic == SHREDDER_MAGIC {
+        info!("- Detected shredder format");
+        return Ok(Some(Box::new(())));
     }
     
     if app_ctx.has_option("nvt_raw:key") {
@@ -46,29 +56,35 @@ pub fn is_novatek_raw_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>,
 }
 
 pub fn extract_novatek_raw(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
-    let mut file = app_ctx.file().ok_or("Extractor expected file")?;
+    let file = app_ctx.file().ok_or("Extractor expected file")?;
     
     let key_hex = app_ctx.options.iter()
         .find(|o| o.starts_with("nvt_raw:key="))
-        .map(|o| o.strip_prefix("nvt_raw:key=").unwrap())
-        .or(keys::NOVATEK_RAW.first().map(|(_, k)| *k));
+        .map(|o| o.strip_prefix("nvt_raw:key=").unwrap());
     
     let key_hex = match key_hex {
         Some(k) => k,
-        None => return Err("nvt_raw:key=<hex_key> option required for decryption".into()),
+        None => keys::NOVATEK_RAW.first().map(|(_, k)| *k).ok_or("nvt_raw:key=<hex_key> option required for decryption")?,
     };
     
     let key = hex::decode(key_hex).map_err(|e| format!("Invalid hex key: {}", e))?;
     
     let file_size = file.metadata()?.len() as usize;
-    let enc_data = common::read_file(&mut file, 0, file_size)?;
+    let enc_data = common::read_file(&file, 0, file_size)?;
     
     info!("- File size: {} bytes", file_size);
     info!("- Decrypting with AES-{}...", if key.len() == 16 { "128" } else { "256" });
     
-    let dec_data = decrypt_aes_ecb_auto(&key, &enc_data)?;
-    
-    info!("- Decryption complete");
+    let dec_data = match decrypt_aes_ecb_auto(&key, &enc_data) {
+        Ok(d) => {
+            info!("- Decryption complete");
+            d
+        }
+        Err(_) => {
+            warn!("- AES-ECB failed, trying XOR...");
+            xor_decrypt(&key, &enc_data)
+        }
+    };
     
     fs::create_dir_all(&app_ctx.output_dir)?;
     
@@ -89,4 +105,8 @@ pub fn extract_novatek_raw(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
     }
     
     Ok(())
+}
+
+fn xor_decrypt(key: &[u8], data: &[u8]) -> Vec<u8> {
+    data.iter().enumerate().map(|(i, b)| b ^ key[i % key.len()]).collect()
 }

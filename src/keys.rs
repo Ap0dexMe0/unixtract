@@ -171,10 +171,10 @@ pub static EPK: &[(&str, &str)] = &[
 
 //Vestel keys
 pub static VESTEL: &[(&str, &str)] = &[
-    ("VESTEL-MB180/MB130/MB181/MB230/MB211/MB281", "12345678123456781234567812345678"),
+    ("VESTEL-MB180/MB130/MB181/MB230/MB281", "12345678123456781234567812345678"),
 ];
 
 //Novatek/MStar custom keys
 pub static NOVATEK_RAW: &[(&str, &str)] = &[
-    ("MB211", "A9A05FC6F986254382DF2C93DEDF7B98"),
+    ("MB211_shredder", "A9A05FC6F986254382DF2C93DEDF7B98"),
 ];

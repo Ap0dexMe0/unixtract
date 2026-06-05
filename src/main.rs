@@ -99,16 +99,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize logger based on verbosity level
     // Default (no flags): show info-level output (normal progress)
     // -q: errors only
-    // -v: info (same as default, explicit)
-    // -vv: debug level (more details)
+    // -v: debug level (more details)
+    // -vv: trace level (everything)
     // -vvv: trace level (everything)
     let log_level = if args.quiet {
         "error"
     } else {
         match args.verbose {
             0 => "info",
-            1 => "info",
-            2 => "debug",
+            1 => "debug",
             _ => "trace",
         }
     };
@@ -118,14 +117,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .format_target(false)
         .format_module_path(false)
         .format(|buf, record| {
-            // Clean format: just the message for info/debug/trace
-            // Add level prefix for warn/error so they stand out
             match record.level() {
-                log::Level::Error => writeln!(buf, "[ERROR] {}", record.args()),
-                log::Level::Warn => writeln!(buf, "[WARN]  {}", record.args()),
-                log::Level::Info => writeln!(buf, "{}", record.args()),
-                log::Level::Debug => writeln!(buf, "[DBG]   {}", record.args()),
-                log::Level::Trace => writeln!(buf, "[TRC]   {}", record.args()),
+                log::Level::Error => writeln!(buf, "\x1b[31m[ERROR]\x1b[0m {}", record.args()),
+                log::Level::Warn => writeln!(buf, "\x1b[33m[WARN]\x1b[0m  {}", record.args()),
+                log::Level::Info => writeln!(buf, "\x1b[36m{}\x1b[0m", record.args()),
+                log::Level::Debug => writeln!(buf, "\x1b[32m[DBG]\x1b[0m   {}", record.args()),
+                log::Level::Trace => writeln!(buf, "\x1b[90m[TRC]\x1b[0m   {}", record.args()),
             }
         })
         .init();

@@ -13,7 +13,7 @@ use binrw::BinReaderExt;
 use crate::utils::common;
 use include::*;
 use tsb_des::decrypt;
-use log::info;
+use log::{debug, info};
 
 struct TsbBinCtx {
     key: Option<[u8; 8]>
@@ -24,12 +24,14 @@ pub fn is_tsb_bin_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box
 
     let header = common::read_file(&file, 0, 256)?;
     if is_valid_header_checksum(&header) {
+        debug!("tsb_bin: valid header checksum, no decryption needed");
         return Ok(Some(Box::new(TsbBinCtx {key: None})));
     }
 
     // -- failed, try with decrypt
     //derive key from FILE SIZE (yes)
     let file_size = file.metadata()?.len() as u32;
+    debug!("tsb_bin: header checksum failed, trying size-derived key (file_size={})", file_size);
     let mut key = [0u8; 8];
     key[..4].copy_from_slice(&file_size.to_le_bytes());
     let inv = !file_size;
@@ -46,6 +48,7 @@ pub fn is_tsb_bin_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box
 pub fn extract_tsb_bin(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
     let ctx = ctx.downcast::<TsbBinCtx>().map_err(|_| "Invalid context type")?;
+    debug!("tsb_bin: extracted {} key", if ctx.key.is_some() {"size-derived"} else {"none (plain)"});
 
     let mut header = common::read_file(&mut file, 0, 0x400)?;
     if let Some(key) = ctx.key {    //decrypt header
@@ -61,6 +64,8 @@ pub fn extract_tsb_bin(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Bo
             ,hdr.length, hdr.entry_count, hdr.build_no(), hdr.entry_addr);
 
     for (i, entry) in hdr.entries.iter().enumerate() {
+        debug!("tsb_bin: entry[{}] name={} offset={} size={} load_addr=0x{:02x} comp={}",
+            i+1, entry.name(), entry.offset, entry.size, entry.load_addr, entry.is_compressed());
         info!("\n({}/{}) - {}, Size: {}, Offset: {}, Load address: 0x{:02x}",
                 i+1, hdr.entry_count, entry.name(), entry.size, entry.offset, entry.load_addr);
         

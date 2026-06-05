@@ -14,7 +14,7 @@ use crate::utils::common;
 use crate::keys;
 use crate::utils::aes::{decrypt_aes128_cbc_pcks7};
 use include::decrypt_xor;
-use log::info;
+use log::{debug, info};
 
 pub fn is_samsung_old_dir(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let dir = match app_ctx.dir() {Some(d) => d, None => return Ok(None)};
@@ -28,9 +28,11 @@ pub fn is_samsung_old_dir(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, 
 
 pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let path = app_ctx.dir().ok_or("Extractor expected directory")?;
+    debug!("samsung_old: scanning directory {}", path.display());
 
     let fw_info = fs::read_to_string(Path::new(&path).join("image/info.txt"))?;
     info!("Firmware info: {}", fw_info);
+    debug!("samsung_old: fw_info raw: {}", fw_info);
 
     let image_path = Path::new(&path).join("image");
 
@@ -44,6 +46,7 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
         }
     }
     if let Some(p) = secret {
+        debug!("samsung_old: matched secret for prefix '{}'", fw_info.split_whitespace().next().unwrap_or("?"));
         info!("Secret: {}", p);
     } else {
         return Err("This firmware is not supported!".into());
@@ -59,6 +62,7 @@ pub fn extract_samsung_old(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
                     let file = File::open(&path)?;
                     let filename = path.file_name().unwrap().to_str().unwrap();
                     let file_size = file.metadata()?.len();
+                    debug!("samsung_old: processing .sec file '{}' ({} bytes)", filename, file_size);
                     info!("\nFile - {}", filename);
 
                     let data = common::read_file(&file, 0, file_size.try_into().unwrap())?;

@@ -1,4 +1,4 @@
-use log::info;
+use log::{debug, info};
 
 mod include;
 mod pana_dvd_crypto;
@@ -65,6 +65,7 @@ pub fn is_pana_dvd_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Bo
 pub fn extract_pana_dvd(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
     let context = ctx.downcast::<PanaDvdContext>().map_err(|_| "Invalid context type")?;
+    debug!("pana_dvd extraction: is_aes={}, base_hdr_size={}", context.is_aes, context.base_hdr_size);
 
     let matching_key = context.matching_key;
     let mut file_entries: Vec<FileEntry> = Vec::new();
@@ -73,6 +74,7 @@ pub fn extract_pana_dvd(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
     if context.is_aes {
         let (aes_key, aes_iv) = (context.aes_key.unwrap(), context.aes_iv.unwrap());
         info!("Using key: {} + AES key: {}, IV: {}", hex::encode_upper(matching_key), hex::encode_upper(aes_key), hex::encode_upper(aes_iv));
+        debug!("pana_dvd: AES mode, reading 48-byte file table");
 
         //read inner file table
         let file_table = common::read_exact(&mut file, 48)?;
@@ -82,17 +84,21 @@ pub fn extract_pana_dvd(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
         for _i in 0..4 {
             let file_entry: AesHeaderFileEntry = file_table_reader.read_le()?;
             if file_entry.size == 0 && file_entry.offset == 0 {
+                debug!("pana_dvd: AES file table entry {} is zero, stopping", _i);
                 break
             }
             //ignore duplicate entries
             if !file_entries.iter().any(|f| f.offset == file_entry.offset ){
+                debug!("pana_dvd: AES file table entry {}: offset={}, size={}", _i, file_entry.offset, file_entry.size);
                 file_entries.push(FileEntry { offset: file_entry.offset, size: file_entry.size, header_size: context.base_hdr_size });
             } 
         }
 
     } else {
         info!("Using key: {}", hex::encode_upper(matching_key));
-        file_entries.push(FileEntry { offset: 0, size: file.metadata()?.len() as u32, header_size: context.base_hdr_size });
+        let file_size = file.metadata()?.len() as u32;
+        debug!("pana_dvd: non-AES mode, treating entire file as single entry, size={}", file_size);
+        file_entries.push(FileEntry { offset: 0, size: file_size, header_size: context.base_hdr_size });
     }
 
     info!("File contains {} sub-files...", file_entries.len());

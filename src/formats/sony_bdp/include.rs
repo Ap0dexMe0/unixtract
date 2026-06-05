@@ -1,6 +1,7 @@
 use crate::utils::common;
 use binrw::BinRead;
 
+#[derive(Debug)]
 pub enum EncryptionType {
     HexSubst,
     AesOfb(([u8; 16], [u8; 16], String)),   //key, iv, key name

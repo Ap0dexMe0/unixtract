@@ -10,7 +10,7 @@ use binrw::BinReaderExt;
 use crate::utils::common;
 use crate::utils::aes::decrypt_aes256_ecb;
 use include::*;
-use log::info;
+use log::{debug, info};
 
 pub fn is_pfl_upg_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -26,12 +26,15 @@ pub fn is_pfl_upg_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box
 pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
 
-    let header: Header = file.read_le()?; 
+    let header: Header = file.read_le()?;
+    debug!("pfl_upg header: header_size={}, data_size={}, mask=0x{:08X}",
+        header.header_size, header.data_size, header.mask);
     let signature = common::read_exact(&mut file, 128)?;
     let _ = common::read_exact(&mut file, 32)?; //unknown
 
     let version_bytes = common::read_exact(&mut file, 28)?;
     let version = common::string_from_bytes(&version_bytes);
+    debug!("pfl_upg version: {}", version);
 
     info!("\nVersion: {}", version);
     if header.description() != "" { //look ugly when empty
@@ -39,6 +42,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         info!("-------------------");
     }
     info!("Data size: {}", header.data_size);
+    debug!("pfl_upg: is_encrypted={}", header.is_encrypted());
 
     file.seek(SeekFrom::Start(header.header_size as u64))?;
 
@@ -48,8 +52,10 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         
         //get some data as test ciphertext for key finding
         let ciphertext = common::read_file(&mut file, header.header_size as u64, 64)?;
+        debug!("pfl_upg: ciphertext for key search is {} bytes", ciphertext.len());
         let aes_key;
         if let Some((key_name, key)) = try_find_key(&signature, &ciphertext)? {
+            debug!("pfl_upg: matched RSA pubkey '{}'", key_name);
             info!("Matched pubkey: {}, AES key: {}", key_name, hex::encode(key));
             aes_key = key;
         } else {
@@ -58,6 +64,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
 
         //need to align to 16 bytes for AES blocksize
         let encrypted_data = common::read_exact(&mut file, (header.data_size as usize + 0xf) & !0xf)?;
+        debug!("pfl_upg: encrypted data read {} bytes", encrypted_data.len());
 
         info!("Decrypting data...");
         data = decrypt_aes256_ecb(&aes_key, &encrypted_data)?;
@@ -65,16 +72,22 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
         
     } else {
         data = common::read_exact(&mut file, header.data_size as usize)?;
+        debug!("pfl_upg: unencrypted data read {} bytes", data.len());
     }
 
     let mut data_reader = Cursor::new(data);
+    debug!("pfl_upg: data_reader length={}", data_reader.get_ref().len());
 
     while (data_reader.position() as usize) < data_reader.get_ref().len() {
         let file_header: FileHeader = data_reader.read_le()?; 
+        debug!("pfl_upg: file_header: name_len={}, stored={}, real={}, is_folder={}, is_pkg={}",
+            file_header.file_name().len(), file_header.stored_size, file_header.real_size,
+            file_header.is_folder(), file_header.is_package());
 
         //sometimes has extra header data
         let ex_header_size = file_header.header_size - 76; //76 is base file header size
         let ex_header_bytes = common::read_exact(&mut data_reader, ex_header_size as usize)?;
+        debug!("pfl_upg: ex_header_size={}", ex_header_size);
 
         if file_header.is_folder() {
             info!("\nFolder - {}", file_header.file_name());

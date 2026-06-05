@@ -7,7 +7,7 @@ use crate::AppContext;
 use crate::utils::aes::decrypt_aes_ecb_auto;
 use crate::utils::common;
 use crate::keys;
-use log::{info, warn};
+use log::{debug, info, warn};
 
 // shredder format detectordecryptor
 // Detects files starting with bsl magic and attempts XOR/AES-ECB decryption
@@ -37,18 +37,22 @@ pub fn is_novatek_raw_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>,
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
     
     let file_size = file.metadata()?.len();
+    debug!("novatek_raw detection: file_size={}", file_size);
     
     if file_size < SHREDDER_MAGIC.len() as u64 {
+        debug!("novatek_raw: file too small, skipping");
         return Ok(None);
     }
     
     let magic = common::read_file(&file, 0, SHREDDER_MAGIC.len())?;
+    debug!("novatek_raw: magic bytes={:02X?}", magic);
     if magic == SHREDDER_MAGIC {
         info!("- Detected shredder format");
         return Ok(Some(Box::new(())));
     }
     
     if app_ctx.has_option("nvt_raw:key") {
+        debug!("novatek_raw: forced via nvt_raw:key option");
         return Ok(Some(Box::new(())));
     }
     
@@ -57,32 +61,42 @@ pub fn is_novatek_raw_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>,
 
 pub fn extract_novatek_raw(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let file = app_ctx.file().ok_or("Extractor expected file")?;
+    debug!("Starting novatek_raw extraction");
     
     let key_hex = app_ctx.options.iter()
         .find(|o| o.starts_with("nvt_raw:key="))
         .map(|o| o.strip_prefix("nvt_raw:key=").unwrap());
     
     let key_hex = match key_hex {
-        Some(k) => k,
+        Some(k) => {
+            debug!("Using CLI-provided key");
+            k
+        }
         None => keys::NOVATEK_RAW.first().map(|(_, k)| *k).ok_or("nvt_raw:key=<hex_key> option required for decryption")?,
     };
+    debug!("Key source: {}", key_hex);
     
     let key = hex::decode(key_hex).map_err(|e| format!("Invalid hex key: {}", e))?;
+    debug!("Decoded key length: {} bytes", key.len());
     
     let file_size = file.metadata()?.len() as usize;
     let enc_data = common::read_file(&file, 0, file_size)?;
+    debug!("Read {} encrypted bytes from file", enc_data.len());
     
     info!("- File size: {} bytes", file_size);
     info!("- Decrypting with AES-{}...", if key.len() == 16 { "128" } else { "256" });
     
     let dec_data = match decrypt_aes_ecb_auto(&key, &enc_data) {
         Ok(d) => {
+            debug!("AES-ECB decryption succeeded, output size: {} bytes", d.len());
             info!("- Decryption complete");
             d
         }
-        Err(_) => {
-            warn!("- AES-ECB failed, trying XOR...");
-            xor_decrypt(&key, &enc_data)
+        Err(e) => {
+            warn!("- AES-ECB failed ({}), trying XOR...", e);
+            let xored = xor_decrypt(&key, &enc_data);
+            debug!("XOR fallback decryption output size: {} bytes", xored.len());
+            xored
         }
     };
     
@@ -94,6 +108,7 @@ pub fn extract_novatek_raw(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
     info!("- Saved decrypted image to {}", output_path.display());
     
     info!("\nExtracting partitions:");
+    let mut extracted_count = 0;
     for (name, offset, size) in NVT_PARTITIONS {
         if (offset + size) as usize <= dec_data.len() && size > 0 {
             let part_data = &dec_data[offset as usize..(offset + size) as usize];
@@ -101,8 +116,13 @@ pub fn extract_novatek_raw(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(
             let mut part_file = OpenOptions::new().write(true).create(true).open(&part_path)?;
             part_file.write_all(part_data)?;
             info!("  {}: offset=0x{:x}, size={}", name, offset, size);
+            debug!("Wrote {}: {} bytes to {}", name, part_data.len(), part_path.display());
+            extracted_count += 1;
+        } else if size > 0 {
+            debug!("Skipping {} (out of range: offset=0x{:x}, size={}, total={})", name, offset, size, dec_data.len());
         }
     }
+    debug!("Total partitions extracted: {}", extracted_count);
     
     Ok(())
 }

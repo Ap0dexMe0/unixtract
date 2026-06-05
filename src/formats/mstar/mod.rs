@@ -12,7 +12,7 @@ use crate::utils::compression::{decompress_lzma, decompress_lz4};
 use crate::utils::lzop::{unlzop_to_file};
 use crate::utils::sparse::{unsparse_to_file};
 use include::*;
-use log::info;
+use log::{debug, info};
 
 pub fn is_mstar_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -28,11 +28,13 @@ pub fn is_mstar_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<d
 
 pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let file = app_ctx.file().ok_or("Extractor expected file")?;
+    debug!("mstar: starting extraction, script at 0x0 and fallback at 0x1000");
 
     let mut script = common::read_file(&file, 0, 32768)?;
 
     if let Some(pos) = script.iter().position(|x| [0x00, 0xFF].contains(x)) {
         script.truncate(pos);
+        debug!("mstar: script truncated at offset {}", pos);
     }
 
     let mut script_string = String::from_utf8_lossy(&script);
@@ -40,23 +42,28 @@ pub fn extract_mstar(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
         //try for hisense
         info!("Failed to get script at 0x0, trying 0x1000...");
         script = common::read_file(&file, 4096, 32768)?;
+        debug!("mstar: fallback script read {} bytes at 0x1000", script.len());
 
         if let Some(pos) = script.iter().position(|x| [0x00, 0xFF].contains(x)) {
             script.truncate(pos);
+            debug!("mstar: fallback script truncated at offset {}", pos);
         }
 
         script_string = String::from_utf8_lossy(&script);
 
         if script_string.is_empty() {
+            debug!("mstar: both script reads empty, failing");
             return Err("Failed to get script".into());
         }
     }
     opt_dump_dec_hdr(app_ctx, &script, "script")?;
 
     let lines: Vec<&str> = script_string.lines().map(|l| l.trim()).collect();
+    debug!("mstar: script has {} non-empty lines", lines.len());
 
     for (i, line) in lines.iter().enumerate() {
         if line.starts_with("filepartload") {
+            debug!("mstar: line[{}] = filepartload: {}", i, line);
             let parts: Vec<&str> = line.split_whitespace().collect();
             let offset = parse_number(parts[3]).unwrap_or(0);
             let size = parse_number(parts[4]).unwrap_or(0);

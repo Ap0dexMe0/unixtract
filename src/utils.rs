@@ -1,3 +1,4 @@
+pub mod sevenz;
 pub mod common;
 pub mod aes;
 pub mod lzop;

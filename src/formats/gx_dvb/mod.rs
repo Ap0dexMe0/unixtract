@@ -8,7 +8,7 @@ use crate::AppContext;
 use crate::utils::common;
 use binrw::BinReaderExt;
 use include::*;
-use log::info;
+use log::{debug, info};
 
 pub fn is_gx_dvb_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -26,6 +26,7 @@ pub fn extract_gx_dvb(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Bo
 
     file.seek(SeekFrom::Start(TABLE_OFFSET))?;
     let table: PartTable = file.read_be()?;
+    debug!("Table raw: part_count={}", table.part_count);
 
     info!("Part count: {}", table.part_count);
 

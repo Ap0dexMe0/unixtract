@@ -10,12 +10,13 @@ use std::io::{Write, Seek, SeekFrom};
 use crate::utils::common;
 use crate::utils::compression::{decompress_zlib};
 use include::*;
-use log::info;
+use log::{debug, info};
 
 pub fn is_pup_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
 
     let header = common::read_file(&file, 0, 4)?;
+    debug!("pup: magic check {:02X?} -> ps4={} ps5={}", header, header==b"\x4F\x15\x3D\x1D", header==b"\x54\x14\xF5\xEE");
     if header == b"\x4F\x15\x3D\x1D" || header == b"\x54\x14\xF5\xEE" { //ps4, ps5
         Ok(Some(Box::new(())))
     } else {
@@ -25,10 +26,12 @@ pub fn is_pup_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn
 
 pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
+    debug!("pup: starting extraction");
 
     let header: Header = file.read_le()?;
     info!("File info:\nFile size: {}\nEntry count: {}",
             header.file_size, header.entry_count);
+    debug!("pup: header file_size={}, entry_count={}", header.file_size, header.entry_count);
 
     let mut entries: Vec<Entry> = Vec::new();
     let mut block_tables: Vec<Entry> = Vec::new();
@@ -36,13 +39,17 @@ pub fn extract_pup(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<d
     for _i in 0..header.entry_count {
         let entry: Entry = file.read_le()?;
         if entry.is_block_table() {
+            debug!("pup: entry {} is a block table", _i);
             block_tables.push(entry.clone())
         }
         entries.push(entry);
     }
+    debug!("pup: parsed {} entries, {} block tables", entries.len(), block_tables.len());
 
     let mut e_i = 0;
     for entry in &entries {
+        debug!("pup: entry[{}] id={} offset={} comp={} blocked={} block_table={}",
+            e_i, entry.id(), entry.offset, entry.is_compressed(), entry.is_blocked(), entry.is_block_table());
         info!("\n({}/{}) - ID: {} Offset: {}, Compressed Size: {}, Uncompressed Size: {}\nCompressed: {}, Blocked: {}, Block table: {}",
             e_i + 1, entries.len(), entry.id(), entry.offset, entry.compressed_size, entry.uncompressed_size, entry.is_compressed(), entry.is_blocked(), entry.is_block_table());
 

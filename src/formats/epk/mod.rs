@@ -5,7 +5,7 @@ use crate::AppContext;
 use crate::utils::common;
 use crate::utils::aes::decrypt_aes_ecb_auto;
 use crate::formats;
-use log::info;
+use log::{debug, info};
 
 pub struct EpkContext {
     epk_version: u8,
@@ -16,9 +16,12 @@ pub fn is_epk_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
 
     let versions = common::read_file(&file, 1712, 36)?;
+    debug!("epk: version bytes at 1712: {:02X?}", versions);
     if let Some(epk_version) = check_epk_version(&versions) {
+        debug!("epk: matched EPK v{}", epk_version);
         Ok(Some(Box::new(EpkContext {epk_version, versions})))
     } else {
+        debug!("epk: no version pattern matched");
         Ok(None)
     }
 }
@@ -58,6 +61,7 @@ fn match_with_pattern(data: &[u8], pattern: &str) -> bool {
 pub fn extract_epk(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
     let ctx = ctx.downcast::<EpkContext>().map_err(|_| "Invalid context type")?;
+    debug!("epk: dispatching EPK v{} extraction", ctx.epk_version);
 
     let platform_version = common::string_from_bytes(&ctx.versions[4..20]);
     let sdk_version = common::string_from_bytes(&ctx.versions[20..36]);

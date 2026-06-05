@@ -15,7 +15,7 @@ use crate::utils::aes::{decrypt_aes128_cbc_nopad};
 use crate::keys;
 use lzhs::{decompress_mtk_to_file};
 use include::*;
-use log::{info, warn};
+use log::{debug, info, warn};
 
 pub struct MtkPkgContext {
     is_philips_variant: bool,
@@ -27,17 +27,21 @@ pub fn is_mtk_pkg_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box
 
     let mut encrypted_header = common::read_file(&file, 0, HEADER_SIZE)?;
     let mut header = decrypt_aes128_cbc_nopad(&encrypted_header, &HEADER_KEY, &HEADER_IV)?;
+    debug!("mtk_pkg detection: default magic={:02X?}", &header[4..12]);
     if &header[4..12] == MTK_HEADER_MAGIC {
-        Ok(Some(Box::new(MtkPkgContext { is_philips_variant: false, decrypted_header: header})))
+        debug!("mtk_pkg: matched standard variant");
+        return Ok(Some(Box::new(MtkPkgContext { is_philips_variant: false, decrypted_header: header})));
     } else {
         // try for philips which has additional 128 bytes at beginning
         encrypted_header = common::read_file(&file, PHILIPS_EXTRA_HEADER_SIZE as u64, HEADER_SIZE)?;
         header = decrypt_aes128_cbc_nopad(&encrypted_header, &HEADER_KEY, &HEADER_IV)?;
+        debug!("mtk_pkg detection: philips magic={:02X?}", &header[4..12]);
         if &header[4..12] == MTK_HEADER_MAGIC {
-            Ok(Some(Box::new(MtkPkgContext { is_philips_variant: true, decrypted_header: header })))
+            debug!("mtk_pkg: matched philips variant");
+            return Ok(Some(Box::new(MtkPkgContext { is_philips_variant: true, decrypted_header: header })));
         } else {
+            debug!("mtk_pkg: no magic match, skipping");
             Ok(None)
-
         }
     }
 }

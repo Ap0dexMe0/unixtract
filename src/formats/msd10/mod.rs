@@ -14,7 +14,7 @@ use crate::formats::msd::{decrypt_aes_salted_old, decrypt_aes_salted_tizen, decr
 use crate::formats::msd::msd_ouith_parser_old::{parse_ouith_blob};
 use crate::formats::msd::msd_ouith_parser_tizen_1_8::{parse_blob_1_8};
 use include::*;
-use log::info;
+use log::{debug, info};
 
 pub fn is_msd10_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -48,6 +48,7 @@ pub fn extract_msd10(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
     for i in 0..header_count {
         let header: HeaderEntry = file.read_le()?;
         info!("Header {}: {}, offset: {}, size: {}", i + 1, header.name(), header.offset, header.size);
+        debug!("msd10: header[{}] name={} offset={} size={}", i + 1, header.name(), header.offset, header.size);
         headers.push(header);
     }
 
@@ -65,9 +66,12 @@ pub fn extract_msd10(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
     let mut firmware_type: Option<FirmwareType> = None;
     for (key_hex, name) in keys::MSD10 {
         let key_bytes = hex::decode(key_hex)?;
+        debug!("msd10: trying key '{}' ({} bytes, {})", name, key_bytes.len(),
+            if key_bytes.len() == 20 { "OLD" } else { "TIZEN" });
         if key_bytes.len() == 20 {
             match decrypt_aes_salted_old(&toc_data, &key_bytes) {
                 Ok(_) => {
+                    debug!("msd10: key '{}' matched (OLD firmware)", name);
                     passphrase_bytes = Some(key_bytes);
                     passphrase_name = name;
                     firmware_type = Some(FirmwareType::Old);
@@ -79,6 +83,7 @@ pub fn extract_msd10(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
         else if key_bytes.len() == 16 {
             match decrypt_aes_salted_tizen(&toc_data, &key_bytes) {
                 Ok(_) => {
+                    debug!("msd10: key '{}' matched (Tizen firmware)", name);
                     passphrase_bytes = Some(key_bytes);
                     passphrase_name = name;
                     firmware_type = Some(FirmwareType::Tizen);
@@ -90,18 +95,22 @@ pub fn extract_msd10(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
     }
 
     let (passphrase_bytes, firmware_type) = if let (Some(p), Some(t)) = (passphrase_bytes, firmware_type) {
+        debug!("msd10: matched key '{}' -> firmware_type={:?}", passphrase_name, t);
         info!("Using passphrase: {}", passphrase_name);
         (p, t)
     } else {
+        debug!("msd10: no key matched out of {} keys tried", keys::MSD10.len());
         return Err("No matching key found!".into());
     };
 
     //parse TOC
     if firmware_type == FirmwareType::Tizen {
         let toc = decrypt_aes_salted_tizen(&toc_data, &passphrase_bytes)?;
+        debug!("msd10: TOC decrypted (Tizen), {} bytes", toc.len());
         opt_dump_dec_hdr(app_ctx, &toc, "toc")?;
         
         let (items, info) = parse_blob_1_8(&toc, app_ctx.has_option("msd:print_ouith"))?;
+        debug!("msd10: parsed {} TOC items", items.len());
 
         if let Some(info) = info {
             info!("\nImage info:\n{} {}.{} {}/{}/{}",
@@ -111,6 +120,7 @@ pub fn extract_msd10(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
         for (i, item) in items.iter().enumerate() {
             let size = sections[i as usize].size;
             let offset = sections[i as usize].offset;
+            debug!("msd10: item[{}] id={} offset={} size={} aes={}", i+1, item.item_id, offset, size, item.aes_encryption);
 
             info!("\n({}/{}) - {}, Size: {}",
                     i + 1, items.len(), item.name, size);
@@ -141,9 +151,11 @@ pub fn extract_msd10(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
 
     } else if firmware_type == FirmwareType::Old {
         let toc = decrypt_aes_salted_old(&toc_data, &passphrase_bytes)?;
+        debug!("msd10: TOC decrypted (Old), {} bytes", toc.len());
         opt_dump_dec_hdr(app_ctx, &toc, "toc")?;
         
         let (items, info) = parse_ouith_blob(&toc, app_ctx.has_option("msd:print_ouith"))?;
+        debug!("msd10: parsed {} OUITH items", items.len());
 
         if let Some(info) = info {
             info!("\nImage info:\n{} {}.{} {}/{}/20{}",
@@ -159,6 +171,8 @@ pub fn extract_msd10(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box
             if sections[i as usize].index != item.item_id {
                 return Err("Item ID in TOC does not match ID from header!".into());
             }
+            debug!("msd10: processing item[{}] type={} offset={} heading={} data={} aes={}",
+                i+1, type_str, offset, item.heading_size, item.data_size, item.aes_encryption);
 
             let mut out_filename = format!("{}", item.name);
             if item.item_type == 0x11 { //CMAC DATA

@@ -1,7 +1,7 @@
 use crate::utils::common;
 use binrw::BinRead;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum FirmwareType{
     Old,
     Tizen,

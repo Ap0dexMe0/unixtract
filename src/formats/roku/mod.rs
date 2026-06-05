@@ -11,7 +11,7 @@ use binrw::BinReaderExt;
 use crate::utils::common;
 use crate::utils::aes::{decrypt_aes128_cbc_nopad, decrypt_aes128_cbc_pcks7};
 use include::*;
-use log::info;
+use log::{debug, info};
 
 pub fn is_roku_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dyn std::error::Error>> {
     let file = match app_ctx.file() {Some(f) => f, None => return Ok(None)};
@@ -28,19 +28,25 @@ pub fn is_roku_file(app_ctx: &AppContext) -> Result<Option<Box<dyn Any>>, Box<dy
 
 pub fn extract_roku(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = app_ctx.file().ok_or("Extractor expected file")?;
+    debug!("roku: starting extraction");
 
     let mut encrypted_data = Vec::new();
-    file.read_to_end(&mut encrypted_data)?;
+    let read_size = file.read_to_end(&mut encrypted_data)?;
+    debug!("roku: read {} bytes from file", read_size);
 
     info!("\nDecrypting...\n");
     let tar_data = decrypt_aes128_cbc_pcks7(&encrypted_data, &FILE_KEY, &FILE_IV)?;
+    debug!("roku: decrypted to {} bytes of tar data", tar_data.len());
     let tar_reader = Cursor::new(tar_data);
     let mut tar_archive = Archive::new(tar_reader);
 
+    let mut entry_count = 0;
     for entry_result in tar_archive.entries_with_seek()? {
         let mut entry = entry_result?;
+        entry_count += 1;
         
         let path = entry.path()?.to_path_buf();
+        debug!("roku: tar entry[{}] = {:?}, size={}", entry_count, path, entry.header().size()?);
 
         if path == std::path::Path::new("manifest") {
             let size = entry.header().size()? as usize;

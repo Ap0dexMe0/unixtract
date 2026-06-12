@@ -119,11 +119,13 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
 
     //The last file is the host MTK BDP file so we can extract that here (wont work for pre-linux which have old mtk bdp though.)
     if last_file_path.is_some() {
-        let last_file = File::open(last_file_path.unwrap())?;
+        let last_file_path = last_file_path.unwrap();
+        let last_file = File::open(&last_file_path)?;
         let mtk_extraction_path = app_ctx.output_dir.join(format!("{}", i));
 
         let ctx: AppContext = AppContext {
             input: InputTarget::File(last_file),
+            input_path: Some(last_file_path),
             output_dir: mtk_extraction_path,
             options: app_ctx.options.clone(),
             dry_run: app_ctx.dry_run,

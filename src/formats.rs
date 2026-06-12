@@ -25,6 +25,7 @@ pub struct Format {
 }
 
 pub mod mstar;
+pub mod android_ota_zip;
 pub mod mstar_secure_old;
 pub mod samsung_old;
 pub mod nvt_timg;
@@ -78,6 +79,11 @@ pub mod mtk_bdp;
 /// before their inner formats to avoid misdetection.
 pub fn get_registry() -> Vec<Format> {
     vec![
+        Format {
+            name: "android_ota_zip",
+            detector_func: crate::formats::android_ota_zip::is_android_ota_zip_file,
+            extractor_func: crate::formats::android_ota_zip::extract_android_ota_zip,
+        },
         Format {
             name: "mstar",
             detector_func: crate::formats::mstar::is_mstar_file,

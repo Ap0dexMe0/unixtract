@@ -125,6 +125,7 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
             let r_temp_file = File::open(&temp_path)?;
             let in_ctx: AppContext = AppContext {
                 input: InputTarget::File(r_temp_file),
+                input_path: None,
                 output_dir: output_path,
                 options: app_ctx.options.clone(),
                 dry_run: app_ctx.dry_run,

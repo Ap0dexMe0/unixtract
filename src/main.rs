@@ -4,7 +4,7 @@ mod keys;
 mod utils;
 
 use clap::Parser;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::io::{self, Seek, SeekFrom, Write};
 use std::fs::{self, File};
 use crate::formats::{Format, get_registry};
@@ -55,6 +55,7 @@ pub enum InputTarget {
 
 pub struct AppContext {
     pub input: InputTarget,
+    pub input_path: Option<PathBuf>,
     pub output_dir: PathBuf,
     pub options: Vec<String>,
     pub dry_run: bool,
@@ -68,6 +69,10 @@ impl AppContext {
             InputTarget::File(f) => Some(f),
             _ => None,
         }
+    }
+
+    pub fn input_path(&self) -> Option<&Path> {
+        self.input_path.as_deref()
     }
 
     pub fn dir(&self) -> Option<&PathBuf> {
@@ -169,6 +174,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let file = File::open(&target_path)?;
         app_ctx = AppContext {
             input: InputTarget::File(file),
+            input_path: Some(target_path.clone()),
             output_dir: output_directory_path,
             options: args.options,
             dry_run: args.dry_run,
@@ -177,7 +183,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         };
     } else if target_path.is_dir() {
         app_ctx = AppContext {
-            input: InputTarget::Directory(target_path),
+            input: InputTarget::Directory(target_path.clone()),
+            input_path: Some(target_path.clone()),
             output_dir: output_directory_path,
             options: args.options,
             dry_run: args.dry_run,

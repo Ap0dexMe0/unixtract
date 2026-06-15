@@ -48,6 +48,7 @@ pub mod bdl;
 pub mod amlogic;
 pub mod sdboot;
 pub mod sdimage;
+pub mod emmc_userarea;
 pub mod cd5;
 pub mod gx_dvb;
 pub mod onkyo;
@@ -118,6 +119,11 @@ pub fn get_registry() -> Vec<Format> {
             name: "sdimage",
             detector_func: crate::formats::sdimage::is_sdimage_file,
             extractor_func: crate::formats::sdimage::extract_sdimage,
+        },
+        Format {
+            name: "emmc_userarea",
+            detector_func: crate::formats::emmc_userarea::is_emmc_userarea_file,
+            extractor_func: crate::formats::emmc_userarea::extract_emmc_userarea,
         },
         Format {
             name: "novatek",

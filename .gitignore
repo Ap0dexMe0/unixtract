@@ -6,3 +6,4 @@ wvenv/
 dist/
 firmware/
 device/
+dist/

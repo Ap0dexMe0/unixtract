@@ -2,3 +2,7 @@
 __pycache__/
 .vscode
 venv/
+wvenv/
+dist/
+firmware/
+device/

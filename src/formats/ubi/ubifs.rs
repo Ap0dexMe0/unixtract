@@ -183,18 +183,21 @@ fn scan_nodes(
         }
 
         let crc = le32(image, off + 4);
-        let len = le32(image, off + 8) as usize;
-        let node_type = image[off + 12];
+        // Common header: magic(0) crc(4) sqnum(8,u64) len(16,u32) node_type(20).
+        let len = le32(image, off + 16) as usize;
+        let node_type = image[off + 20];
 
         if len < CH_SZ || off + len > n {
             off += 8;
             continue;
         }
 
-        // Validate CRC-32 over everything after the crc field.
+        // Validate CRC-32 over everything after the crc field. UBIFS uses the
+        // Linux crc32() (init 0xFFFFFFFF, no final XOR), which is the bitwise
+        // complement of the standard zlib CRC that flate2 computes.
         let mut c = Crc::new();
         c.update(&image[off + 8..off + len]);
-        if c.sum() != crc {
+        if (c.sum() ^ 0xFFFF_FFFF) != crc {
             off += 8;
             continue;
         }

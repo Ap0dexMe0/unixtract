@@ -1,0 +1,3070 @@
+{
+  "header_signatures": [
+    {
+      "offset": 0,
+      "hex": "89 50 4E 47 0D 0A 1A 0A",
+      "extension": "png",
+      "description": "PNG image",
+      "mime": "image/png"
+    },
+    {
+      "offset": 0,
+      "hex": "FF D8 FF",
+      "extension": "jpg",
+      "description": "JPEG image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF D8 FF E0",
+      "extension": "jpg",
+      "description": "JPEG/JFIF image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF D8 FF E1",
+      "extension": "jpg",
+      "description": "JPEG/EXIF image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF D8 FF E2",
+      "extension": "jpg",
+      "description": "JPEG/Canon image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF D8 FF E8",
+      "extension": "jpg",
+      "description": "JPEG/SPIFF image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF D8 FF DB",
+      "extension": "jpg",
+      "description": "JPEG image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF D8 FF EE",
+      "extension": "jpg",
+      "description": "JPEG image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "47 49 46 38 37 61",
+      "extension": "gif",
+      "description": "GIF image (87a)",
+      "mime": "image/gif"
+    },
+    {
+      "offset": 0,
+      "hex": "47 49 46 38 39 61",
+      "extension": "gif",
+      "description": "GIF image (89a)",
+      "mime": "image/gif"
+    },
+    {
+      "offset": 0,
+      "hex": "42 4D",
+      "extension": "bmp",
+      "description": "BMP bitmap image",
+      "mime": "image/bmp"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 01 00",
+      "extension": "ico",
+      "description": "ICO icon file",
+      "mime": "image/x-icon"
+    },
+    {
+      "offset": 0,
+      "hex": "49 49 2A 00",
+      "extension": "tif",
+      "description": "TIFF image (little-endian)",
+      "mime": "image/tiff"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 4D 00 2A",
+      "extension": "tif",
+      "description": "TIFF image (big-endian)",
+      "mime": "image/tiff"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 4D 00 2B",
+      "extension": "tif",
+      "description": "TIFF/EP (big-endian)",
+      "mime": "image/tiff"
+    },
+    {
+      "offset": 0,
+      "hex": "49 49 2B 00",
+      "extension": "tif",
+      "description": "TIFF/EP (little-endian)",
+      "mime": "image/tiff"
+    },
+    {
+      "offset": 0,
+      "hex": "52 49 46 46",
+      "extension": "webp",
+      "description": "WebP image (RIFF container)",
+      "mime": "image/webp"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 01 00",
+      "extension": "cur",
+      "description": "CUR cursor file",
+      "mime": "image/x-win-bitmap"
+    },
+    {
+      "offset": 0,
+      "hex": "FF 4F 52",
+      "extension": "ora",
+      "description": "OpenRaster image",
+      "mime": "image/openraster"
+    },
+    {
+      "offset": 0,
+      "hex": "38 42 50 53",
+      "extension": "psd",
+      "description": "Photoshop PSD image",
+      "mime": "image/vnd.adobe.photoshop"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 00 0C 6A 50 20 20",
+      "extension": "jp2",
+      "description": "JPEG 2000 image",
+      "mime": "image/jp2"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 00 0C 6A 50 20 1A",
+      "extension": "jp2",
+      "description": "JPEG 2000 image (J2K)",
+      "mime": "image/jp2"
+    },
+    {
+      "offset": 0,
+      "hex": "69 69 70 66",
+      "extension": "pcx",
+      "description": "PC Paintbrush PCX image",
+      "mime": "image/x-pcx"
+    },
+    {
+      "offset": 0,
+      "hex": "D7 CD C6 9A",
+      "extension": "wmf",
+      "description": "Windows Metafile WMF",
+      "mime": "image/wmf"
+    },
+    {
+      "offset": 0,
+      "hex": "01 00 09 00 00 03",
+      "extension": "wmf",
+      "description": "Windows Metafile WMF (Placeable)",
+      "mime": "image/wmf"
+    },
+    {
+      "offset": 0,
+      "hex": "45 58 49 46",
+      "extension": "exif",
+      "description": "EXIF image",
+      "mime": "image/jpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "25 50 44 46",
+      "extension": "pdf",
+      "description": "PDF document",
+      "mime": "application/pdf"
+    },
+    {
+      "offset": 0,
+      "hex": "25 50 44 46 2D 31 2E 34",
+      "extension": "pdf",
+      "description": "PDF 1.4 document",
+      "mime": "application/pdf"
+    },
+    {
+      "offset": 0,
+      "hex": "25 50 44 46 2D 31 2E 35",
+      "extension": "pdf",
+      "description": "PDF 1.5 document",
+      "mime": "application/pdf"
+    },
+    {
+      "offset": 0,
+      "hex": "25 50 44 46 2D 31 2E 36",
+      "extension": "pdf",
+      "description": "PDF 1.6 document",
+      "mime": "application/pdf"
+    },
+    {
+      "offset": 0,
+      "hex": "25 50 44 46 2D 31 2E 37",
+      "extension": "pdf",
+      "description": "PDF 1.7 document",
+      "mime": "application/pdf"
+    },
+    {
+      "offset": 0,
+      "hex": "25 50 44 46 2D 32 2E 30",
+      "extension": "pdf",
+      "description": "PDF 2.0 document",
+      "mime": "application/pdf"
+    },
+    {
+      "offset": 0,
+      "hex": "D0 CF 11 E0 A1 B1 1A E1",
+      "extension": "doc",
+      "description": "OLE2 compound document (DOC/XLS/PPT)",
+      "mime": "application/x-ole-storage"
+    },
+    {
+      "offset": 0,
+      "hex": "7B 5C 72 74 66 31",
+      "extension": "rtf",
+      "description": "RTF document",
+      "mime": "application/rtf"
+    },
+    {
+      "offset": 0,
+      "hex": "EF BB BF",
+      "extension": "txt",
+      "description": "UTF-8 encoded text (with BOM)",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "FF FE",
+      "extension": "txt",
+      "description": "UTF-16LE encoded text (with BOM)",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "FE FF",
+      "extension": "txt",
+      "description": "UTF-16BE encoded text (with BOM)",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "2A 2A 2A 20 49 6E 73 74 61 6C 6C 20 53 68 69 65 6C 64",
+      "extension": "ins",
+      "description": "InstallShield installer",
+      "mime": "application/x-installshield"
+    },
+    {
+      "offset": 0,
+      "hex": "1B 25 2D 31 32 33 34 35",
+      "extension": "eps",
+      "description": "EPS/PostScript",
+      "mime": "application/postscript"
+    },
+    {
+      "offset": 0,
+      "hex": "25 21 50 53",
+      "extension": "eps",
+      "description": "EPS/PostScript",
+      "mime": "application/postscript"
+    },
+    {
+      "offset": 0,
+      "hex": "50 4B 03 04 14 00 01 00",
+      "extension": "zip",
+      "description": "ZIP archive (empty/encrypted)",
+      "mime": "application/zip"
+    },
+    {
+      "offset": 0,
+      "hex": "50 4B 03 04",
+      "extension": "zip",
+      "description": "ZIP archive",
+      "mime": "application/zip"
+    },
+    {
+      "offset": 0,
+      "hex": "50 4B 05 06",
+      "extension": "zip",
+      "description": "ZIP archive (empty central dir)",
+      "mime": "application/zip"
+    },
+    {
+      "offset": 0,
+      "hex": "50 4B 07 08",
+      "extension": "zip",
+      "description": "ZIP archive (spanned)",
+      "mime": "application/zip"
+    },
+    {
+      "offset": 0,
+      "hex": "52 61 72 21 1A 07 00",
+      "extension": "rar",
+      "description": "RAR archive (v4)",
+      "mime": "application/vnd.rar"
+    },
+    {
+      "offset": 0,
+      "hex": "52 61 72 21 1A 07 01 00",
+      "extension": "rar",
+      "description": "RAR archive (v5)",
+      "mime": "application/vnd.rar"
+    },
+    {
+      "offset": 0,
+      "hex": "37 7A BC AF 27 1C",
+      "extension": "7z",
+      "description": "7-Zip archive",
+      "mime": "application/x-7z-compressed"
+    },
+    {
+      "offset": 0,
+      "hex": "1F 8B 08",
+      "extension": "gz",
+      "description": "GZIP compressed file",
+      "mime": "application/gzip"
+    },
+    {
+      "offset": 0,
+      "hex": "1F 8B",
+      "extension": "gz",
+      "description": "GZIP compressed file (short)",
+      "mime": "application/gzip"
+    },
+    {
+      "offset": 0,
+      "hex": "42 5A 68",
+      "extension": "bz2",
+      "description": "BZIP2 compressed file",
+      "mime": "application/x-bzip2"
+    },
+    {
+      "offset": 0,
+      "hex": "FD 37 7A 58 5A 00",
+      "extension": "xz",
+      "description": "XZ compressed file",
+      "mime": "application/x-xz"
+    },
+    {
+      "offset": 0,
+      "hex": "75 73 74 61 72",
+      "extension": "tar",
+      "description": "TAR (POSIX ustar format)",
+      "mime": "application/x-tar"
+    },
+    {
+      "offset": 0,
+      "hex": "1F 9D 90",
+      "extension": "z",
+      "description": "Z compressed file (LZW)",
+      "mime": "application/x-compress"
+    },
+    {
+      "offset": 0,
+      "hex": "1F A0",
+      "extension": "z",
+      "description": "Z compressed file (LZH)",
+      "mime": "application/x-compress"
+    },
+    {
+      "offset": 0,
+      "hex": "78 01",
+      "extension": "zlib",
+      "description": "zlib compressed data (no compression)",
+      "mime": "application/zlib"
+    },
+    {
+      "offset": 0,
+      "hex": "78 5E",
+      "extension": "zlib",
+      "description": "zlib compressed data (default)",
+      "mime": "application/zlib"
+    },
+    {
+      "offset": 0,
+      "hex": "78 9C",
+      "extension": "zlib",
+      "description": "zlib compressed data (default/CMF)",
+      "mime": "application/zlib"
+    },
+    {
+      "offset": 0,
+      "hex": "78 DA",
+      "extension": "zlib",
+      "description": "zlib compressed data (max compression)",
+      "mime": "application/zlib"
+    },
+    {
+      "offset": 0,
+      "hex": "78 20",
+      "extension": "zlib",
+      "description": "zlib compressed data (no compression)",
+      "mime": "application/zlib"
+    },
+    {
+      "offset": 0,
+      "hex": "ED AB EE DB",
+      "extension": "rpm",
+      "description": "RPM package",
+      "mime": "application/x-rpm"
+    },
+    {
+      "offset": 0,
+      "hex": "4C 5A 49 50",
+      "extension": "lz",
+      "description": "LZIP compressed file",
+      "mime": "application/x-lzip"
+    },
+    {
+      "offset": 0,
+      "hex": "4C 5A 4F 30",
+      "extension": "lzo",
+      "description": "LZOP compressed file",
+      "mime": "application/x-lzop"
+    },
+    {
+      "offset": 0,
+      "hex": "03 00 00 00",
+      "extension": "cab",
+      "description": "CAB archive (1)",
+      "mime": "application/vnd.ms-cab-compressed"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 53 43 46",
+      "extension": "cab",
+      "description": "CAB archive (MSCF)",
+      "mime": "application/vnd.ms-cab-compressed"
+    },
+    {
+      "offset": 0,
+      "hex": "49 53 63 28",
+      "extension": "cab",
+      "description": "CAB archive (InstallShield)",
+      "mime": "application/vnd.ms-cab-compressed"
+    },
+    {
+      "offset": 0,
+      "hex": "28 B5 2F FD",
+      "extension": "zst",
+      "description": "Zstandard compressed file",
+      "mime": "application/zstd"
+    },
+    {
+      "offset": 0,
+      "hex": "04 22 4D 18",
+      "extension": "lz4",
+      "description": "LZ4 compressed file (legacy)",
+      "mime": "application/x-lz4"
+    },
+    {
+      "offset": 0,
+      "hex": "02 21 4C 18",
+      "extension": "lz4",
+      "description": "LZ4 compressed file (frame)",
+      "mime": "application/x-lz4"
+    },
+    {
+      "offset": 0,
+      "hex": "64 65 66 6C 61 74 65",
+      "extension": "zz",
+      "description": "Deflate (raw)",
+      "mime": "application/x-deflate"
+    },
+    {
+      "offset": 0,
+      "hex": "1A 2B 3C 4D",
+      "extension": "msi",
+      "description": "MSI Windows Installer (OLE2)",
+      "mime": "application/x-msi"
+    },
+    {
+      "offset": 0,
+      "hex": "5A 4F 4F 20",
+      "extension": "zoo",
+      "description": "ZOO archive",
+      "mime": "application/x-zoo"
+    },
+    {
+      "offset": 0,
+      "hex": "60 EA",
+      "extension": "arj",
+      "description": "ARJ archive",
+      "mime": "application/x-arj"
+    },
+    {
+      "offset": 0,
+      "hex": "61 72 63 68 69 76 65 0A",
+      "extension": "ar",
+      "description": "Unix AR archive",
+      "mime": "application/x-archive"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 5A",
+      "extension": "exe",
+      "description": "Windows executable (MZ/PE)",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 5A 90 00",
+      "extension": "exe",
+      "description": "Windows PE executable",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 5A 50 00",
+      "extension": "exe",
+      "description": "Windows NE executable (16-bit)",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "offset": 0,
+      "hex": "7F 45 4C 46",
+      "extension": "elf",
+      "description": "ELF executable (32-bit)",
+      "mime": "application/x-elf"
+    },
+    {
+      "offset": 0,
+      "hex": "7F 45 4C 46 02",
+      "extension": "elf",
+      "description": "ELF executable (64-bit)",
+      "mime": "application/x-elf"
+    },
+    {
+      "offset": 0,
+      "hex": "7F 45 4C 46 01 01 01 00",
+      "extension": "elf",
+      "description": "ELF executable (Linux, 32-bit)",
+      "mime": "application/x-elf"
+    },
+    {
+      "offset": 0,
+      "hex": "7F 45 4C 46 02 01 01 00",
+      "extension": "elf",
+      "description": "ELF executable (Linux, 64-bit)",
+      "mime": "application/x-elf"
+    },
+    {
+      "offset": 0,
+      "hex": "FE ED FA CE",
+      "extension": "macho",
+      "description": "Mach-O 32-bit (ARM/macOS)",
+      "mime": "application/x-mach-binary"
+    },
+    {
+      "offset": 0,
+      "hex": "FE ED FA CF",
+      "extension": "macho",
+      "description": "Mach-O 64-bit (x86_64/macOS)",
+      "mime": "application/x-mach-binary"
+    },
+    {
+      "offset": 0,
+      "hex": "CE FA ED FE",
+      "extension": "macho",
+      "description": "Mach-O 32-bit (reverse, macOS)",
+      "mime": "application/x-mach-binary"
+    },
+    {
+      "offset": 0,
+      "hex": "CF FA ED FE",
+      "extension": "macho",
+      "description": "Mach-O 64-bit (reverse, macOS)",
+      "mime": "application/x-mach-binary"
+    },
+    {
+      "offset": 0,
+      "hex": "CA FE BA BE",
+      "extension": "class",
+      "description": "Java class file",
+      "mime": "application/x-java-class"
+    },
+    {
+      "offset": 0,
+      "hex": "49 6E 74 65 6C",
+      "extension": "com",
+      "description": "Intel HEX file",
+      "mime": "application/x-intel-hex"
+    },
+    {
+      "offset": 0,
+      "hex": "3A",
+      "extension": "com",
+      "description": "COM executable (DOS)",
+      "mime": "application/x-msdos-program"
+    },
+    {
+      "offset": 0,
+      "hex": "4E 45 53 1A",
+      "extension": "nes",
+      "description": "NES ROM",
+      "mime": "application/x-nes-rom"
+    },
+    {
+      "offset": 0,
+      "hex": "CE ED 66 66",
+      "extension": "le",
+      "description": "Linear Executable (LE)",
+      "mime": "application/x-linear-executable"
+    },
+    {
+      "offset": 0,
+      "hex": "E0 00 00 00",
+      "extension": "arm",
+      "description": "ARM embedded image",
+      "mime": "application/x-arm-executable"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 5A",
+      "extension": "dll",
+      "description": "PE32+ DLL (.NET or native)",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 5A",
+      "extension": "exe",
+      "description": "PE32+ executable (.NET or native)",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "offset": 0,
+      "hex": "44 65 78 0A 30 33 35 00",
+      "extension": "dex",
+      "description": "Android DEX (Dalvik Executable)",
+      "mime": "application/x-dex"
+    },
+    {
+      "offset": 0,
+      "hex": "64 65 78 0A 30 33 35 00",
+      "extension": "dex",
+      "description": "Android DEX v035",
+      "mime": "application/x-dex"
+    },
+    {
+      "offset": 0,
+      "hex": "64 65 78 0A 30 33 36 00",
+      "extension": "dex",
+      "description": "Android DEX v036",
+      "mime": "application/x-dex"
+    },
+    {
+      "offset": 0,
+      "hex": "64 65 78 0A 30 33 37 00",
+      "extension": "dex",
+      "description": "Android DEX v037",
+      "mime": "application/x-dex"
+    },
+    {
+      "offset": 0,
+      "hex": "41 52 54",
+      "extension": "art",
+      "description": "Android ART runtime image",
+      "mime": "application/x-android-art"
+    },
+    {
+      "offset": 0,
+      "hex": "6F 76 6D",
+      "extension": "ovm",
+      "description": "Android OAT (Optimized ART)",
+      "mime": "application/x-android-oat"
+    },
+    {
+      "offset": 0,
+      "hex": "49 44 33",
+      "extension": "mp3",
+      "description": "MP3 audio (ID3v2 tag)",
+      "mime": "audio/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF FB 90",
+      "extension": "mp3",
+      "description": "MP3 audio (MPEG-1 Layer 3, 128k)",
+      "mime": "audio/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF FB",
+      "extension": "mp3",
+      "description": "MP3 audio (MPEG-1 Layer 3)",
+      "mime": "audio/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF F3",
+      "extension": "mp3",
+      "description": "MP3 audio (MPEG-1 Layer 3)",
+      "mime": "audio/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF F2",
+      "extension": "mp3",
+      "description": "MP3 audio (MPEG-1 Layer 3)",
+      "mime": "audio/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF E3",
+      "extension": "mp3",
+      "description": "MP3 audio (MPEG-1 Layer 3)",
+      "mime": "audio/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "FF FA",
+      "extension": "mp3",
+      "description": "MP3 audio (MPEG-2 Layer 3)",
+      "mime": "audio/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "52 49 46 46",
+      "extension": "wav",
+      "description": "WAV audio (RIFF)",
+      "mime": "audio/wav"
+    },
+    {
+      "offset": 0,
+      "hex": "66 4C 61 43",
+      "extension": "flac",
+      "description": "FLAC audio",
+      "mime": "audio/flac"
+    },
+    {
+      "offset": 0,
+      "hex": "4F 67 67 53",
+      "extension": "ogg",
+      "description": "OGG audio/video stream",
+      "mime": "audio/ogg"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 54 68 64",
+      "extension": "mid",
+      "description": "MIDI audio (Standard MIDI)",
+      "mime": "audio/midi"
+    },
+    {
+      "offset": 0,
+      "hex": "2E 73 6E 64",
+      "extension": "au",
+      "description": "Sun/NeXT audio (\u03bc-law)",
+      "mime": "audio/basic"
+    },
+    {
+      "offset": 0,
+      "hex": "64 6E 73 2E",
+      "extension": "au",
+      "description": "Sun/NeXT audio (\u03bc-law reverse)",
+      "mime": "audio/basic"
+    },
+    {
+      "offset": 0,
+      "hex": "46 4F 52 4D 00",
+      "extension": "aiff",
+      "description": "AIFF audio",
+      "mime": "audio/aiff"
+    },
+    {
+      "offset": 0,
+      "hex": "46 4F 52 4D",
+      "extension": "aif",
+      "description": "AIFF audio (generic)",
+      "mime": "audio/aiff"
+    },
+    {
+      "offset": 0,
+      "hex": "30 26 B2 75 8E 66 CF 11",
+      "extension": "wma",
+      "description": "WMA/ASF audio",
+      "mime": "audio/x-ms-wma"
+    },
+    {
+      "offset": 0,
+      "hex": "66 74 79 70 4D 34 41 20",
+      "extension": "m4a",
+      "description": "MPEG-4 audio (M4A)",
+      "mime": "audio/mp4"
+    },
+    {
+      "offset": 0,
+      "hex": "66 74 79 70 4D 34 42 20",
+      "extension": "m4b",
+      "description": "MPEG-4 audiobook (M4B)",
+      "mime": "audio/mp4"
+    },
+    {
+      "offset": 0,
+      "hex": "66 74 79 70 4D 34 50 20",
+      "extension": "m4p",
+      "description": "MPEG-4 audio (M4P protected)",
+      "mime": "audio/mp4"
+    },
+    {
+      "offset": 0,
+      "hex": "52 49 46 46",
+      "extension": "ra",
+      "description": "RealAudio (RIFF container)",
+      "mime": "audio/x-pn-realaudio"
+    },
+    {
+      "offset": 0,
+      "hex": "2E 72 61 FD",
+      "extension": "ra",
+      "description": "RealAudio (RealMedia)",
+      "mime": "audio/x-pn-realaudio"
+    },
+    {
+      "offset": 0,
+      "hex": "2E 52 4D 46",
+      "extension": "rm",
+      "description": "RealMedia RM",
+      "mime": "application/vnd.rn-realmedia"
+    },
+    {
+      "offset": 0,
+      "hex": "41 50 45 54",
+      "extension": "ape",
+      "description": "Monkey's Audio APE",
+      "mime": "audio/x-ape"
+    },
+    {
+      "offset": 4,
+      "hex": "66 74 79 70 69 73 6F 6D",
+      "extension": "mp4",
+      "description": "MP4 video (ISOM base)",
+      "mime": "video/mp4"
+    },
+    {
+      "offset": 4,
+      "hex": "66 74 79 70 4D 53 4E 56",
+      "extension": "mp4",
+      "description": "MP4 video (MSNV)",
+      "mime": "video/mp4"
+    },
+    {
+      "offset": 4,
+      "hex": "66 74 79 70 71 74 20 20",
+      "extension": "mov",
+      "description": "QuickTime MOV",
+      "mime": "video/quicktime"
+    },
+    {
+      "offset": 4,
+      "hex": "66 74 79 70 33 67 70 35",
+      "extension": "3gp",
+      "description": "3GPP video",
+      "mime": "video/3gpp"
+    },
+    {
+      "offset": 4,
+      "hex": "66 74 79 70 33 67 70 36",
+      "extension": "3gp",
+      "description": "3GPP2 video",
+      "mime": "video/3gpp2"
+    },
+    {
+      "offset": 4,
+      "hex": "66 74 79 70 4D 50 34 32",
+      "extension": "mp4",
+      "description": "MP4 video (MP42)",
+      "mime": "video/mp4"
+    },
+    {
+      "offset": 4,
+      "hex": "66 74 79 70 64 61 73 68",
+      "extension": "mp4",
+      "description": "MPEG-DASH",
+      "mime": "video/mp4"
+    },
+    {
+      "offset": 0,
+      "hex": "52 49 46 46",
+      "extension": "avi",
+      "description": "AVI video (RIFF)",
+      "mime": "video/x-msvideo"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 00 18 66 74 79 70 33 67 70 35",
+      "extension": "3gp",
+      "description": "3GPP video (short)",
+      "mime": "video/3gpp"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 00 1C 66 74 79 70 6D 70 34 32",
+      "extension": "mp4",
+      "description": "MP4 video (MP42 short)",
+      "mime": "video/mp4"
+    },
+    {
+      "offset": 0,
+      "hex": "1A 45 DF A3",
+      "extension": "mkv",
+      "description": "Matroska video (MKV/MKA/MKS)",
+      "mime": "video/x-matroska"
+    },
+    {
+      "offset": 0,
+      "hex": "1A 45 DF A3 93 42 82 88",
+      "extension": "mkv",
+      "description": "Matroska video (MKV)",
+      "mime": "video/x-matroska"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 01 BA",
+      "extension": "mpg",
+      "description": "MPEG-1/2 Program Stream",
+      "mime": "video/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 01 B3",
+      "extension": "mpg",
+      "description": "MPEG-1/2 Video Stream",
+      "mime": "video/mpeg"
+    },
+    {
+      "offset": 0,
+      "hex": "46 4C 56 01",
+      "extension": "flv",
+      "description": "FLV video",
+      "mime": "video/x-flv"
+    },
+    {
+      "offset": 0,
+      "hex": "52 49 46 46",
+      "extension": "webm",
+      "description": "WebM video (RIFF)",
+      "mime": "video/webm"
+    },
+    {
+      "offset": 0,
+      "hex": "66 74 79 70 61 76 63 31",
+      "extension": "mp4",
+      "description": "MP4 video (AVC1)",
+      "mime": "video/mp4"
+    },
+    {
+      "offset": 0,
+      "hex": "66 74 79 70 68 65 76 31",
+      "extension": "mp4",
+      "description": "MP4 video (HEV1)",
+      "mime": "video/mp4"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 00 0C 6A 50 20 20",
+      "extension": "mj2",
+      "description": "Motion JPEG 2000",
+      "mime": "video/mj2"
+    },
+    {
+      "offset": 0,
+      "hex": "53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00",
+      "extension": "sqlite",
+      "description": "SQLite database",
+      "mime": "application/x-sqlite3"
+    },
+    {
+      "offset": 0,
+      "hex": "03 00 00 00",
+      "extension": "dbf",
+      "description": "dBASE database (v3)",
+      "mime": "application/x-dbf"
+    },
+    {
+      "offset": 0,
+      "hex": "04 00 00 00",
+      "extension": "dbf",
+      "description": "dBASE database (v4)",
+      "mime": "application/x-dbf"
+    },
+    {
+      "offset": 0,
+      "hex": "05 00 00 00",
+      "extension": "dbf",
+      "description": "dBASE database (v5)",
+      "mime": "application/x-dbf"
+    },
+    {
+      "offset": 0,
+      "hex": "30 30 30 30 30 30 30 30",
+      "extension": "mdb",
+      "description": "Microsoft Access MDB",
+      "mime": "application/x-msaccess"
+    },
+    {
+      "offset": 0,
+      "hex": "00 01 00 00 53 74 61 6E 64 61 72 64 20 41 43 45",
+      "extension": "accdb",
+      "description": "Microsoft Access ACE (ACCDB)",
+      "mime": "application/x-msaccess"
+    },
+    {
+      "offset": 0,
+      "hex": "FF 62 69 74 63 6F 6D 70",
+      "extension": "db",
+      "description": "Berkeley DB",
+      "mime": "application/x-bdb"
+    },
+    {
+      "offset": 0,
+      "hex": "45 52 02 00 00 00",
+      "extension": "iso",
+      "description": "ISO 9660 CD/DVD image",
+      "mime": "application/x-iso9660-image"
+    },
+    {
+      "offset": 0,
+      "hex": "43 44 30 30 31",
+      "extension": "cdr",
+      "description": "Corel CDR image",
+      "mime": "image/x-coreldraw"
+    },
+    {
+      "offset": 0,
+      "hex": "47 44 52 49 52 45 43 54",
+      "extension": "gdr",
+      "description": "GDrive image",
+      "mime": "image/x-gdrive"
+    },
+    {
+      "offset": 0,
+      "hex": "63 6F 6E 65 63 74 69 78",
+      "extension": "vhd",
+      "description": "Virtual PC VHD (Connectix)",
+      "mime": "application/x-vhd"
+    },
+    {
+      "offset": 0,
+      "hex": "76 68 64 78",
+      "extension": "vhdx",
+      "description": "Hyper-V VHDX",
+      "mime": "application/x-vhdx"
+    },
+    {
+      "offset": 0,
+      "hex": "23 21 2F 62 69 6E 2F 71",
+      "extension": "qcow",
+      "description": "QEMU QCOW image",
+      "mime": "application/x-qemu-disk"
+    },
+    {
+      "offset": 0,
+      "hex": "51 46 49 00 00 02 00 00",
+      "extension": "qcow2",
+      "description": "QEMU QCOW2 image",
+      "mime": "application/x-qemu-disk"
+    },
+    {
+      "offset": 0,
+      "hex": "4F 56 46",
+      "extension": "ovf",
+      "description": "Open Virtualization Format (OVF)",
+      "mime": "application/x-ovf"
+    },
+    {
+      "offset": 0,
+      "hex": "4B 44 4D",
+      "extension": "vmdk",
+      "description": "VMware VMDK (KDM)",
+      "mime": "application/x-vmdk"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+      "extension": "vmdk",
+      "description": "VMware VMDK descriptor",
+      "mime": "application/x-vmdk"
+    },
+    {
+      "offset": 0,
+      "hex": "78 01 73 0D 62 62 60",
+      "extension": "dmg",
+      "description": "Apple Disk Image (DMG)",
+      "mime": "application/x-apple-diskimage"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 49 53 43",
+      "extension": "dmg",
+      "description": "Apple DMG (MISCr)",
+      "mime": "application/x-apple-diskimage"
+    },
+    {
+      "offset": 0,
+      "hex": "D4 C3 B2 A1",
+      "extension": "pcap",
+      "description": "PCAP capture (little-endian)",
+      "mime": "application/vnd.tcpdump.pcap"
+    },
+    {
+      "offset": 0,
+      "hex": "A1 B2 C3 D4",
+      "extension": "pcap",
+      "description": "PCAP capture (big-endian)",
+      "mime": "application/vnd.tcpdump.pcap"
+    },
+    {
+      "offset": 0,
+      "hex": "0A 0D 0D 0A",
+      "extension": "pcapng",
+      "description": "PCAPNG capture",
+      "mime": "application/x-pcapng"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 41 52 4B 00 41 8C 00",
+      "extension": "pcap",
+      "description": "Wireshark capture (ng)",
+      "mime": "application/x-pcapng"
+    },
+    {
+      "offset": 0,
+      "hex": "1A 2B 3C 4D",
+      "extension": "pcap",
+      "description": "Packet capture (MICROSOFT)",
+      "mime": "application/x-pcap"
+    },
+    {
+      "offset": 0,
+      "hex": "50 4B 03 04",
+      "extension": "epub",
+      "description": "EPUB e-book (ZIP-based)",
+      "mime": "application/epub+zip"
+    },
+    {
+      "offset": 0,
+      "hex": "52 53 4C 01",
+      "extension": "lit",
+      "description": "Microsoft LIT e-book",
+      "mime": "application/x-ms-reader"
+    },
+    {
+      "offset": 0,
+      "hex": "7B 30 22 63 72 65 61 74 6F 72",
+      "extension": "fb2",
+      "description": "FictionBook 2.0",
+      "mime": "application/fictionbook+xml"
+    },
+    {
+      "offset": 0,
+      "hex": "50 4B 03 04",
+      "extension": "mobi",
+      "description": "MOBI e-book (ZIP-based)",
+      "mime": "application/x-mobipocket-ebook"
+    },
+    {
+      "offset": 0,
+      "hex": "42 4F 4F 4B 4D 4F 42 49",
+      "extension": "mobi",
+      "description": "MOBI e-book (Palm)",
+      "mime": "application/x-mobipocket-ebook"
+    },
+    {
+      "offset": 0,
+      "hex": "54 48 49 53 20 4F 4E 45 20 44 4F 43 55 4D 45 4E",
+      "extension": "pdb",
+      "description": "Palm DB e-book",
+      "mime": "application/x-palm-db"
+    },
+    {
+      "offset": 0,
+      "hex": "00 01 00 00 00",
+      "extension": "ttf",
+      "description": "TrueType font",
+      "mime": "font/ttf"
+    },
+    {
+      "offset": 0,
+      "hex": "4F 54 54 4F",
+      "extension": "otf",
+      "description": "OpenType font",
+      "mime": "font/otf"
+    },
+    {
+      "offset": 0,
+      "hex": "77 4F 46 32",
+      "extension": "woff",
+      "description": "WOFF font",
+      "mime": "font/woff"
+    },
+    {
+      "offset": 0,
+      "hex": "77 4F 46 32 00 01 00 00 00",
+      "extension": "woff2",
+      "description": "WOFF2 font",
+      "mime": "font/woff2"
+    },
+    {
+      "offset": 0,
+      "hex": "66 72 65 65",
+      "extension": "pfa",
+      "description": "PostScript font (PFA)",
+      "mime": "application/x-font-pfa"
+    },
+    {
+      "offset": 0,
+      "hex": "53 46 4E 54",
+      "extension": "sfnt",
+      "description": "SFNT font (collection)",
+      "mime": "font/sfnt"
+    },
+    {
+      "offset": 0,
+      "hex": "4F 43 46 32",
+      "extension": "otc",
+      "description": "OpenType Collection (OTC)",
+      "mime": "font/otc"
+    },
+    {
+      "offset": 0,
+      "hex": "74 72 75 65",
+      "extension": "dfont",
+      "description": "Mac Data Fork TrueType font",
+      "mime": "application/x-font-dfont"
+    },
+    {
+      "offset": 0,
+      "hex": "23 21 2F 62 69 6E 2F 70 79 74 68 6F 6E",
+      "extension": "py",
+      "description": "Python script (shebang)",
+      "mime": "text/x-python"
+    },
+    {
+      "offset": 0,
+      "hex": "23 21",
+      "extension": "py",
+      "description": "Python script (shebang)",
+      "mime": "text/x-python"
+    },
+    {
+      "offset": 0,
+      "hex": "23 21",
+      "extension": "pl",
+      "description": "Perl script (shebang)",
+      "mime": "text/x-perl"
+    },
+    {
+      "offset": 0,
+      "hex": "23 21",
+      "extension": "sh",
+      "description": "Shell script (shebang)",
+      "mime": "text/x-shellscript"
+    },
+    {
+      "offset": 0,
+      "hex": "23 21",
+      "extension": "rb",
+      "description": "Ruby script (shebang)",
+      "mime": "text/x-ruby"
+    },
+    {
+      "offset": 0,
+      "hex": "23 21",
+      "extension": "php",
+      "description": "PHP script (shebang)",
+      "mime": "text/x-php"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 3F 78 6D 6C",
+      "extension": "xml",
+      "description": "XML document",
+      "mime": "application/xml"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 3F 78 6D 6C 20 76 65 72 73 69 6F 6E 3D 22 31",
+      "extension": "xml",
+      "description": "XML 1.0 document",
+      "mime": "application/xml"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 21 44 4F 43 54 59 50 45",
+      "extension": "html",
+      "description": "HTML document",
+      "mime": "text/html"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 48 54 4D 4C",
+      "extension": "html",
+      "description": "HTML document (<HTML)",
+      "mime": "text/html"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 68 74 6D 6C",
+      "extension": "html",
+      "description": "HTML document (<html)",
+      "mime": "text/html"
+    },
+    {
+      "offset": 0,
+      "hex": "7B 0D 0A",
+      "extension": "json",
+      "description": "JSON data (curly LF)",
+      "mime": "application/json"
+    },
+    {
+      "offset": 0,
+      "hex": "7B 0A",
+      "extension": "json",
+      "description": "JSON data (curly)",
+      "mime": "application/json"
+    },
+    {
+      "offset": 0,
+      "hex": "5B 0D 0A",
+      "extension": "json",
+      "description": "JSON array",
+      "mime": "application/json"
+    },
+    {
+      "offset": 0,
+      "hex": "5B",
+      "extension": "json",
+      "description": "JSON array (compact)",
+      "mime": "application/json"
+    },
+    {
+      "offset": 0,
+      "hex": "7B",
+      "extension": "json",
+      "description": "JSON object (compact)",
+      "mime": "application/json"
+    },
+    {
+      "offset": 0,
+      "hex": "28 48 65 61 64 65 72",
+      "extension": "srt",
+      "description": "SubRip subtitle file",
+      "mime": "text/x-srt"
+    },
+    {
+      "offset": 0,
+      "hex": "0A 0D 0D 0A",
+      "extension": "pyc",
+      "description": "Python bytecode (v3.0-3.6)",
+      "mime": "application/x-python-bytecode"
+    },
+    {
+      "offset": 0,
+      "hex": "42 0D 0D 0A",
+      "extension": "pyc",
+      "description": "Python bytecode (v3.7)",
+      "mime": "application/x-python-bytecode"
+    },
+    {
+      "offset": 0,
+      "hex": "4A 0D 0D 0A",
+      "extension": "pyc",
+      "description": "Python bytecode (v3.8-3.10)",
+      "mime": "application/x-python-bytecode"
+    },
+    {
+      "offset": 0,
+      "hex": "4E 0D 0D 0A",
+      "extension": "pyc",
+      "description": "Python bytecode (v3.9-3.10)",
+      "mime": "application/x-python-bytecode"
+    },
+    {
+      "offset": 0,
+      "hex": "42 43",
+      "extension": "bc",
+      "description": "LLVM bitcode",
+      "mime": "application/x-llvm-bitcode"
+    },
+    {
+      "offset": 0,
+      "hex": "00 61 73 6D",
+      "extension": "wasm",
+      "description": "WebAssembly module",
+      "mime": "application/wasm"
+    },
+    {
+      "offset": 0,
+      "hex": "43 57 45 42",
+      "extension": "cweb",
+      "description": "Compiled WebAssembly",
+      "mime": "application/wasm"
+    },
+    {
+      "offset": 0,
+      "hex": "1C 00 00 00",
+      "extension": "pdb",
+      "description": "MS Program Database (PDB)",
+      "mime": "application/x-ms-pdb"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 53 46 54 02 00 01 00",
+      "extension": "psp",
+      "description": "PlayStation PSP executable",
+      "mime": "application/x-psp-exec"
+    },
+    {
+      "offset": 0,
+      "hex": "46 72 6F 6D 20",
+      "extension": "eml",
+      "description": "Email message (From)",
+      "mime": "message/rfc822"
+    },
+    {
+      "offset": 0,
+      "hex": "52 65 74 75 72 6E 2D 50 61 74 68 3A",
+      "extension": "eml",
+      "description": "Email message (Return-Path)",
+      "mime": "message/rfc822"
+    },
+    {
+      "offset": 0,
+      "hex": "44 65 6C 69 76 65 72 65 64 2D 54 6F 3A",
+      "extension": "eml",
+      "description": "Email message (Delivered-To)",
+      "mime": "message/rfc822"
+    },
+    {
+      "offset": 0,
+      "hex": "42 65 67 69 6E",
+      "extension": "eml",
+      "description": "Email message",
+      "mime": "message/rfc822"
+    },
+    {
+      "offset": 0,
+      "hex": "30 31 30 30",
+      "extension": "msg",
+      "description": "Outlook MSG",
+      "mime": "application/vnd.ms-outlook"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 43 45 52 54 49 46 49 43 41 54 45",
+      "extension": "pem",
+      "description": "PEM certificate",
+      "mime": "application/x-pem-file"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 52 53 41 20 50 52 49 56 41 54 45",
+      "extension": "pem",
+      "description": "PEM RSA private key",
+      "mime": "application/x-pem-file"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 50 52 49 56 41 54 45 20 4B 45 59",
+      "extension": "pem",
+      "description": "PEM private key",
+      "mime": "application/x-pem-file"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 45 4E 43 52 59 50 54 45 44",
+      "extension": "pem",
+      "description": "PEM encrypted message",
+      "mime": "application/x-pem-file"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 50 47 50 20 50 55 42 4C 49 43",
+      "extension": "asc",
+      "description": "PGP public key",
+      "mime": "application/pgp-keys"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 50 47 50 20 50 52 49 56 41 54",
+      "extension": "asc",
+      "description": "PGP private key",
+      "mime": "application/pgp-keys"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 50 47 50 20 53 49 47 4E 41 54 55 52 45",
+      "extension": "sig",
+      "description": "PGP signature",
+      "mime": "application/pgp-signature"
+    },
+    {
+      "offset": 0,
+      "hex": "2D 2D 2D 2D 2D 42 45 47 49 4E 20 53 53 48",
+      "extension": "pub",
+      "description": "SSH public key (PEM)",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "30 82",
+      "extension": "der",
+      "description": "DER certificate (X.509)",
+      "mime": "application/x-x509-ca-cert"
+    },
+    {
+      "offset": 0,
+      "hex": "30 81",
+      "extension": "der",
+      "description": "DER certificate (short)",
+      "mime": "application/x-x509-ca-cert"
+    },
+    {
+      "offset": 0,
+      "hex": "80 37 12 40",
+      "extension": "smc",
+      "description": "SNES ROM (Super Magicom)",
+      "mime": "application/x-snes-rom"
+    },
+    {
+      "offset": 0,
+      "hex": "01 00 00 00 00 00 00 00",
+      "extension": "n64",
+      "description": "Nintendo 64 ROM",
+      "mime": "application/x-n64-rom"
+    },
+    {
+      "offset": 0,
+      "hex": "47 41 4D 45",
+      "extension": "gb",
+      "description": "GameBoy ROM (pre-CGB)",
+      "mime": "application/x-gameboy-rom"
+    },
+    {
+      "offset": 0,
+      "hex": "43 47 42 53",
+      "extension": "gba",
+      "description": "GameBoy Advance ROM",
+      "mime": "application/x-gba-rom"
+    },
+    {
+      "offset": 0,
+      "hex": "4E 45 53 1A",
+      "extension": "nes",
+      "description": "NES ROM",
+      "mime": "application/x-nes-rom"
+    },
+    {
+      "offset": 0,
+      "hex": "50 53 58",
+      "extension": "ps1",
+      "description": "PlayStation 1 executable",
+      "mime": "application/x-ps1-exec"
+    },
+    {
+      "offset": 0,
+      "hex": "41 52 45 4E",
+      "extension": "nds",
+      "description": "Nintendo DS ROM",
+      "mime": "application/x-nintendo-ds-rom"
+    },
+    {
+      "offset": 0,
+      "hex": "47 57 49 4E",
+      "extension": "bin",
+      "description": "G-WIN firmware",
+      "mime": "application/x-firmware"
+    },
+    {
+      "offset": 0,
+      "hex": "44 49 46 46",
+      "extension": "bin",
+      "description": "Differential firmware",
+      "mime": "application/x-firmware"
+    },
+    {
+      "offset": 0,
+      "hex": "1F 8B 08 00",
+      "extension": "img",
+      "description": "GZIP'd firmware image",
+      "mime": "application/x-firmware"
+    },
+    {
+      "offset": 0,
+      "hex": "53 43 45 49",
+      "extension": "bin",
+      "description": "SEGGER Embedded Studio image",
+      "mime": "application/x-firmware"
+    },
+    {
+      "offset": 0,
+      "hex": "42 4F 4F 54 2D 44 4E 53",
+      "extension": "bin",
+      "description": "DNS boot image",
+      "mime": "application/x-firmware"
+    },
+    {
+      "offset": 0,
+      "hex": "42 46 42 46",
+      "extension": "bin",
+      "description": "Boot firmware (BFB)",
+      "mime": "application/x-firmware"
+    },
+    {
+      "offset": 0,
+      "hex": "73 74 6C",
+      "extension": "stl",
+      "description": "STL 3D model (ASCII)",
+      "mime": "model/stl"
+    },
+    {
+      "offset": 0,
+      "hex": "53 54 4C 42",
+      "extension": "stl",
+      "description": "STL 3D model (binary)",
+      "mime": "model/stl"
+    },
+    {
+      "offset": 0,
+      "hex": "66 61 63 65",
+      "extension": "obj",
+      "description": "Wavefront OBJ 3D model",
+      "mime": "model/obj"
+    },
+    {
+      "offset": 0,
+      "hex": "4F 42 4A",
+      "extension": "obj",
+      "description": "Wavefront OBJ 3D (binary)",
+      "mime": "model/obj"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 4C 43 41",
+      "extension": "stp",
+      "description": "STP 3D model (STEP)",
+      "mime": "model/step"
+    },
+    {
+      "offset": 0,
+      "hex": "56 4F 58 2D",
+      "extension": "vox",
+      "description": "Voxel model (MagicaVoxel)",
+      "mime": "model/x-voxel"
+    },
+    {
+      "offset": 0,
+      "hex": "D0 CF 11 E0 A1 B1 1A E1",
+      "extension": "stp",
+      "description": "STEP 3D model (OLE2-based)",
+      "mime": "model/step"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 73 76 67",
+      "extension": "svg",
+      "description": "SVG vector graphic",
+      "mime": "image/svg+xml"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 3F 78 6D 6C 20 76 65 72 73 69 6F 6E 3D 22 31 2E 30 22 3F 3E 0A 3C 73 76 67",
+      "extension": "svg",
+      "description": "SVG vector graphic (full XML)",
+      "mime": "image/svg+xml"
+    },
+    {
+      "offset": 0,
+      "hex": "25 50 53 2D 41 64 6F 62 65",
+      "extension": "eps",
+      "description": "Adobe EPS PostScript",
+      "mime": "application/postscript"
+    },
+    {
+      "offset": 0,
+      "hex": "5B",
+      "extension": "ini",
+      "description": "INI configuration file",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "23 20",
+      "extension": "cfg",
+      "description": "Config file (comment)",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "23",
+      "extension": "cfg",
+      "description": "Config file (hash comment)",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "79 61 6D 6C",
+      "extension": "yaml",
+      "description": "YAML document",
+      "mime": "application/x-yaml"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 63 6F 6E 66 69 67",
+      "extension": "xml",
+      "description": "XML config file (<config)",
+      "mime": "application/xml"
+    },
+    {
+      "offset": 0,
+      "hex": "FF 44 4F 53",
+      "extension": "com",
+      "description": "DOS executable (COMMAND)",
+      "mime": "application/x-msdos-program"
+    },
+    {
+      "offset": 0,
+      "hex": "EB 3C 90",
+      "extension": "exe",
+      "description": "Windows PE executable (short)",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "offset": 0,
+      "hex": "EB 31 09",
+      "extension": "exe",
+      "description": "Windows NE executable (16-bit)",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 53 43 46",
+      "extension": "msi",
+      "description": "Windows MSI package (MSCF)",
+      "mime": "application/x-msi"
+    },
+    {
+      "offset": 0,
+      "hex": "43 52 41 50",
+      "extension": "msi",
+      "description": "Windows MSI package (CRAP)",
+      "mime": "application/x-msi"
+    },
+    {
+      "offset": 0,
+      "hex": "23 23 53 65 74",
+      "extension": "reg",
+      "description": "Windows Registry export",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "50 72 69 6E 74 65 72 46 69 6C 65",
+      "extension": "spl",
+      "description": "Windows Printer spool file",
+      "mime": "application/x-ms-spool"
+    },
+    {
+      "offset": 0,
+      "hex": "62 6F 6F 6B 00 00 00 00 00 00 00 00 00 00 00 00",
+      "extension": "ibook",
+      "description": "Apple iBook",
+      "mime": "application/x-ibook"
+    },
+    {
+      "offset": 0,
+      "hex": "6E 64 72 6F 69 64",
+      "extension": "apk",
+      "description": "Android APK (ZIP-based)",
+      "mime": "application/vnd.android.package-archive"
+    },
+    {
+      "offset": 0,
+      "hex": "78 6C 6D 01",
+      "extension": "xlm",
+      "description": "Excel XLM macro (older)",
+      "mime": "application/vnd.ms-excel"
+    },
+    {
+      "offset": 0,
+      "hex": "09 04 06 00 00 00 00 00",
+      "extension": "sdi",
+      "description": "System Deployment Image (SDI)",
+      "mime": "application/x-sdi"
+    },
+    {
+      "offset": 0,
+      "hex": "45 4C 46 46",
+      "extension": "dump",
+      "description": "Executable and Linkable Format (core)",
+      "mime": "application/x-core-dump"
+    },
+    {
+      "offset": 0,
+      "hex": "2F 2F 20",
+      "extension": "c",
+      "description": "C source (// comment)",
+      "mime": "text/x-c"
+    },
+    {
+      "offset": 0,
+      "hex": "2F 2A",
+      "extension": "c",
+      "description": "C source (/* comment)",
+      "mime": "text/x-c"
+    },
+    {
+      "offset": 0,
+      "hex": "69 6D 70 6F 72 74",
+      "extension": "go",
+      "description": "Go source file",
+      "mime": "text/x-go"
+    },
+    {
+      "offset": 0,
+      "hex": "70 61 63 6B 61 67 65",
+      "extension": "go",
+      "description": "Go source (package)",
+      "mime": "text/x-go"
+    },
+    {
+      "offset": 0,
+      "hex": "75 73 69 6E 67",
+      "extension": "cs",
+      "description": "C# source (using)",
+      "mime": "text/x-csharp"
+    },
+    {
+      "offset": 0,
+      "hex": "6E 61 6D 65 73 70 61 63 65",
+      "extension": "cs",
+      "description": "C# source (namespace)",
+      "mime": "text/x-csharp"
+    },
+    {
+      "offset": 0,
+      "hex": "6D 6F 64 75 6C 65",
+      "extension": "fs",
+      "description": "F# source",
+      "mime": "text/x-fsharp"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 27 0A",
+      "extension": "shp",
+      "description": "ESRI Shapefile (SHP)",
+      "mime": "application/x-esri-shapefile"
+    },
+    {
+      "offset": 0,
+      "hex": "00 00 27 0A",
+      "extension": "dbf",
+      "description": "ESRI dBASE file (spatial)",
+      "mime": "application/x-esri-shapefile"
+    },
+    {
+      "offset": 0,
+      "hex": "47 65 6F 54 69 65",
+      "extension": "gpkg",
+      "description": "GeoPackage",
+      "mime": "application/geopackage+sqlite3"
+    },
+    {
+      "offset": 0,
+      "hex": "47 4F 4F 47 4C 45",
+      "extension": "kml",
+      "description": "Google Earth KML",
+      "mime": "application/vnd.google-earth.kml+xml"
+    },
+    {
+      "offset": 0,
+      "hex": "67 69 73 20",
+      "extension": "gml",
+      "description": "Geography Markup Language",
+      "mime": "application/gml+xml"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 3F 78 6D 6C 20 76 65 72 73 69 6F 6E 3D 22 31 2E 30 22 3F 3E 0D 0A 3C 76 69 72 74 6D 61 63 68 69 6E 65",
+      "extension": "vmx",
+      "description": "VMware VMX config",
+      "mime": "application/x-vmx"
+    },
+    {
+      "offset": 0,
+      "hex": "2F 2F 20 56 4D 77 61 72 65",
+      "extension": "vmx",
+      "description": "VMware VMX (comment)",
+      "mime": "application/x-vmx"
+    },
+    {
+      "offset": 0,
+      "hex": "56 43 48 45 41 50",
+      "extension": "vbox",
+      "description": "VirtualBox machine definition (Vchead)",
+      "mime": "application/x-virtualbox"
+    },
+    {
+      "offset": 0,
+      "hex": "73 6E 61 70",
+      "extension": "vdi",
+      "description": "VirtualBox VDI image (snap)",
+      "mime": "application/x-virtualbox-vdi"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 3F 78 6D 6C 20 76 65 72 73 69 6F 6E 3D 22 31 2E 30 22 3F 3E 0D 0A 3C 64 6F 63 6B 65 72",
+      "extension": "dockerfile",
+      "description": "Dockerfile",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "46 52 4F 4D",
+      "extension": "dockerfile",
+      "description": "Dockerfile (FROM)",
+      "mime": "text/plain"
+    },
+    {
+      "offset": 0,
+      "hex": "00 01 00 00 00 00 00 00",
+      "extension": "ani",
+      "description": "ANI cursor animation",
+      "mime": "application/x-navi-animation"
+    },
+    {
+      "offset": 0,
+      "hex": "47 47 50 47",
+      "extension": "ggp",
+      "description": "Gerber Plot (GGP)",
+      "mime": "application/x-gerber"
+    },
+    {
+      "offset": 0,
+      "hex": "50 41 52 41",
+      "extension": "par",
+      "description": "PAR archive",
+      "mime": "application/x-par"
+    },
+    {
+      "offset": 0,
+      "hex": "50 46 4F 52 4D 41 54",
+      "extension": "pfo",
+      "description": "PFO file",
+      "mime": "application/x-pfo"
+    },
+    {
+      "offset": 0,
+      "hex": "50 4B 03 04",
+      "extension": "odt",
+      "description": "OpenDocument (ODT/ODS/ODP)",
+      "mime": "application/vnd.oasis.opendocument"
+    },
+    {
+      "offset": 0,
+      "hex": "53 4C 44 21",
+      "extension": "sld",
+      "description": "SLD file",
+      "mime": "application/x-sld"
+    },
+    {
+      "offset": 0,
+      "hex": "56 45 52 53 49 4F 4E",
+      "extension": "ver",
+      "description": "Version file",
+      "mime": "application/x-version"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 3F 70 68 70",
+      "extension": "php",
+      "description": "PHP script (<?php)",
+      "mime": "text/x-php"
+    },
+    {
+      "offset": 0,
+      "hex": "3C 25",
+      "extension": "asp",
+      "description": "ASP script",
+      "mime": "text/x-asp"
+    },
+    {
+      "offset": 0,
+      "hex": "FF FE 3C 00 3F 00 78 00 6D 00 6C 00",
+      "extension": "xml",
+      "description": "XML (UTF-16LE)",
+      "mime": "application/xml"
+    },
+    {
+      "offset": 0,
+      "hex": "FE FF 00 3C 00 3F 00 78 00 6D 00 6C",
+      "extension": "xml",
+      "description": "XML (UTF-16BE)",
+      "mime": "application/xml"
+    },
+    {
+      "offset": 0,
+      "hex": "43 50 53",
+      "extension": "cps",
+      "description": "CPS (Corel PhotoScript)",
+      "mime": "application/x-cps"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 45 44 49 41",
+      "extension": "dat",
+      "description": "Windows Media Player cache",
+      "mime": "application/x-ms-media-cache"
+    },
+    {
+      "offset": 0,
+      "hex": "44 41 54 41",
+      "extension": "dat",
+      "description": "Generic data file (DATA)",
+      "mime": "application/octet-stream"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 54 68 64",
+      "extension": "smf",
+      "description": "Standard MIDI File",
+      "mime": "audio/midi"
+    },
+    {
+      "offset": 0,
+      "hex": "4A 4D 50 54",
+      "extension": "jmp",
+      "description": "JMP (Jump) file",
+      "mime": "application/x-jmp"
+    },
+    {
+      "offset": 0,
+      "hex": "53 58 43 46",
+      "extension": "sxc",
+      "description": "OpenOffice Calc (SXC, old)",
+      "mime": "application/vnd.sun.xml.calc"
+    },
+    {
+      "offset": 0,
+      "hex": "53 58 57 52",
+      "extension": "sxw",
+      "description": "OpenOffice Writer (SXW, old)",
+      "mime": "application/vnd.sun.xml.writer"
+    },
+    {
+      "offset": 0,
+      "hex": "5A 4F 4F 4D",
+      "extension": "zoom",
+      "description": "Zoom meeting recording",
+      "mime": "video/x-zoom"
+    },
+    {
+      "offset": 0,
+      "hex": "49 54 53 46",
+      "extension": "chm",
+      "description": "Windows Compiled HTML Help (CHM)",
+      "mime": "application/x-chm"
+    },
+    {
+      "offset": 0,
+      "hex": "4C 00 00 00 01 14 02 00",
+      "extension": "lnk",
+      "description": "Windows shortcut (LNK)",
+      "mime": "application/x-ms-shortcut"
+    },
+    {
+      "offset": 0,
+      "hex": "4C 66 4C 65",
+      "extension": "evt",
+      "description": "Windows Event Log (old .evt)",
+      "mime": "application/x-ms-eventlog"
+    },
+    {
+      "offset": 0,
+      "hex": "45 6C 66 46 69 6C 65",
+      "extension": "evtx",
+      "description": "Windows Event Log (EVTX)",
+      "mime": "application/x-ms-eventlog"
+    },
+    {
+      "offset": 0,
+      "hex": "72 65 67 66",
+      "extension": "regf",
+      "description": "Windows Registry hive",
+      "mime": "application/x-ms-registry"
+    },
+    {
+      "offset": 0,
+      "hex": "53 43 43 41",
+      "extension": "pf",
+      "description": "Windows Prefetch file",
+      "mime": "application/x-ms-prefetch"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 44 4D 50",
+      "extension": "dmp",
+      "description": "Windows Minidump (MDMP)",
+      "mime": "application/x-ms-minidump"
+    },
+    {
+      "offset": 0,
+      "hex": "4D 53 57 49 4D",
+      "extension": "wim",
+      "description": "Windows Imaging Format (WIM)",
+      "mime": "application/x-ms-wim"
+    },
+    {
+      "offset": 0,
+      "hex": "57 52 49",
+      "extension": "wri",
+      "description": "Windows Write document",
+      "mime": "application/x-ms-write"
+    },
+    {
+      "offset": 0,
+      "hex": "01 00 00 00 88 00 00 00",
+      "extension": "emf",
+      "description": "Windows Enhanced Metafile (EMF)",
+      "mime": "image/x-emf"
+    },
+    {
+      "offset": 0,
+      "hex": "40 40 40 40",
+      "extension": "edb",
+      "description": "Windows Extensible Storage Engine (ESE) / EDB",
+      "mime": "application/x-ms-edb"
+    },
+    {
+      "offset": 0,
+      "hex": "73 64 62 66",
+      "extension": "sdb",
+      "description": "Windows Application Compatibility DB (SDB)",
+      "mime": "application/x-ms-sdb"
+    },
+    {
+      "offset": 0,
+      "hex": "43 53 43 41",
+      "extension": "cat",
+      "description": "Windows Security Catalog (.cat)",
+      "mime": "application/x-ms-cat"
+    },
+    {
+      "offset": 0,
+      "hex": "50 43 43 43",
+      "extension": "pdb",
+      "description": "Windows PDB (PCCC)",
+      "mime": "application/x-ms-pdb"
+    },
+    {
+      "offset": 0,
+      "hex": "FF FE 23 00 20 00",
+      "extension": "ps1",
+      "description": "PowerShell script (UTF-16LE BOM)",
+      "mime": "text/x-powershell"
+    },
+    {
+      "offset": 0,
+      "hex": "EF BB BF 23",
+      "extension": "ps1",
+      "description": "PowerShell script (UTF-8 BOM)",
+      "mime": "text/x-powershell"
+    },
+    {
+      "offset": 0,
+      "hex": "21 3C 61 72 63 68 3E 0A",
+      "extension": "deb",
+      "description": "Debian package (.deb) -- ar archive",
+      "mime": "application/x-deb"
+    },
+    {
+      "offset": 0,
+      "hex": "4C 50 4B 53 48 48 52 48",
+      "extension": "journal",
+      "description": "systemd journal",
+      "mime": "application/x-systemd-journal"
+    },
+    {
+      "offset": 4086,
+      "hex": "53 57 41 50 53 50 41 43 45 32",
+      "extension": "swap",
+      "description": "Linux swap space (4K pages)",
+      "mime": "application/x-linux-swap"
+    },
+    {
+      "offset": 2038,
+      "hex": "53 57 41 50 53 50 41 43 45 32",
+      "extension": "swap",
+      "description": "Linux swap space (2K pages)",
+      "mime": "application/x-linux-swap"
+    },
+    {
+      "offset": 65526,
+      "hex": "53 57 41 50 53 50 41 43 45 32",
+      "extension": "swap",
+      "description": "Linux swap space (64K pages)",
+      "mime": "application/x-linux-swap"
+    },
+    {
+      "offset": 512,
+      "hex": "4C 56 4D 32 20 30 30 31",
+      "extension": "lvm",
+      "description": "Linux LVM2 volume (pv/vg/lv)",
+      "mime": "application/x-lvm2"
+    },
+    {
+      "offset": 512,
+      "hex": "4C 56 4D 32 20 30 30 32",
+      "extension": "lvm",
+      "description": "Linux LVM2 volume v2",
+      "mime": "application/x-lvm2"
+    },
+    {
+      "offset": 8,
+      "hex": "41 49 02",
+      "extension": "AppImage",
+      "description": "Linux AppImage",
+      "mime": "application/x-appimage"
+    },
+    {
+      "offset": 4096,
+      "hex": "4C 56 4D 32 20 30 30 31",
+      "extension": "lvm",
+      "description": "Linux LVM2 (alt offset 4K)",
+      "mime": "application/x-lvm2"
+    },
+    {
+      "offset": 0,
+      "hex": "30 37 30 37 30 31",
+      "extension": "cpio",
+      "description": "Linux cpio archive (new ASCII)",
+      "mime": "application/x-cpio"
+    },
+    {
+      "offset": 0,
+      "hex": "30 37 30 37 30 32",
+      "extension": "cpio",
+      "description": "Linux cpio archive (new ASCIICRC)",
+      "mime": "application/x-cpio"
+    },
+    {
+      "offset": 0,
+      "hex": "30 37 30 37 30 31 30 31",
+      "extension": "cpio",
+      "description": "Linux cpio archive (new ASCII wide)",
+      "mime": "application/x-cpio"
+    },
+    {
+      "offset": 0,
+      "hex": "02 01 01 00",
+      "extension": "ko",
+      "description": "Linux kernel module (ELF relocatable)",
+      "mime": "application/x-kmodule"
+    },
+    {
+      "offset": 0,
+      "hex": "7F 45 4C 46 02 01 01 03",
+      "extension": "ko",
+      "description": "Linux kernel module (64-bit)",
+      "mime": "application/x-kmodule"
+    },
+    {
+      "offset": 0,
+      "hex": "68 73 71 73",
+      "extension": "squashfs",
+      "description": "Squashfs filesystem v4 (hsqs)",
+      "mime": "application/x-squashfs"
+    },
+    {
+      "offset": 0,
+      "hex": "71 73 69 66",
+      "extension": "squashfs",
+      "description": "Squashfs filesystem (qsif)",
+      "mime": "application/x-squashfs"
+    },
+    {
+      "offset": 0,
+      "hex": "44 46 4C 49 4D 41 47 45",
+      "extension": "disk",
+      "description": "Linux disk image (DFLIMAGE)",
+      "mime": "application/x-disk-image"
+    },
+    {
+      "offset": 0,
+      "hex": "03 00 08 00",
+      "extension": "axml",
+      "description": "Android Binary XML (AXML)",
+      "mime": "application/x-android-axml"
+    },
+    {
+      "offset": 0,
+      "hex": "02 00 0C 00",
+      "extension": "arsc",
+      "description": "Android Resources (ARSC)",
+      "mime": "application/x-android-arsc"
+    },
+    {
+      "offset": 0,
+      "hex": "76 64 65 78",
+      "extension": "vdex",
+      "description": "Android VDEX (Verified DEX)",
+      "mime": "application/x-android-vdex"
+    },
+    {
+      "offset": 0,
+      "hex": "63 64 65 78",
+      "extension": "cdex",
+      "description": "Android CDEX (Compact DEX)",
+      "mime": "application/x-android-cdex"
+    },
+    {
+      "offset": 0,
+      "hex": "41 4E 44 52 4F 49 44 21",
+      "extension": "bootimg",
+      "description": "Android boot image header",
+      "mime": "application/x-android-boot"
+    },
+    {
+      "offset": 0,
+      "hex": "56 42 4D 41",
+      "extension": "vbmeta",
+      "description": "Android Verified Boot (VBMeta)",
+      "mime": "application/x-android-vbmeta"
+    },
+    {
+      "offset": 0,
+      "hex": "41 42 42 41",
+      "extension": "aab",
+      "description": "Android App Bundle (AAB) marker",
+      "mime": "application/x-android-aab"
+    },
+    {
+      "offset": 0,
+      "hex": "4C 50 20 20",
+      "extension": "super",
+      "description": "Android Super (logical partition) image",
+      "mime": "application/x-android-super"
+    },
+    {
+      "offset": 0,
+      "hex": "41 4E 44 52 4F 49 44 20 42 41 43 4B 55 50",
+      "extension": "ab",
+      "description": "Android Backup (.ab)",
+      "mime": "application/x-android-backup"
+    },
+    {
+      "offset": 0,
+      "hex": "4C 50 53 33",
+      "extension": "lpd",
+      "description": "Android logical partition descriptor",
+      "mime": "application/x-android-lpd"
+    }
+  ],
+  "trailer_signatures": [
+    {
+      "hex": "49 45 4E 44 AE 42 60 82",
+      "min_offset_from_end": 8,
+      "extension": "png",
+      "description": "PNG image (IEND trailer)",
+      "mime": "image/png"
+    },
+    {
+      "hex": "50 4B 05 06",
+      "min_offset_from_end": 22,
+      "extension": "zip",
+      "description": "ZIP archive (EOCD trailer)",
+      "mime": "application/zip"
+    },
+    {
+      "hex": "67 6C 6F 62 61 6C 73 00",
+      "min_offset_from_end": 16,
+      "extension": "dat",
+      "description": "Berkeley DB (globals trailer)",
+      "mime": "application/x-bdb"
+    },
+    {
+      "hex": "2D 2D 2D 2D 2D 45 4E 44 20 43 45 52 54 49 46 49 43 41 54 45 2D 2D 2D 2D 2D",
+      "min_offset_from_end": 0,
+      "extension": "pem",
+      "description": "PEM certificate (END trailer)",
+      "mime": "application/x-pem-file"
+    },
+    {
+      "hex": "49 53 45 6E 64 00 00 00",
+      "min_offset_from_end": 12,
+      "extension": "iso",
+      "description": "ISO 9660 volume trailer",
+      "mime": "application/x-iso9660-image"
+    }
+  ],
+  "deep_search_signatures": [
+    {
+      "hex": "55 50 58 30",
+      "extension": "exe",
+      "description": "UPX packed executable (UPX0)",
+      "mime": "application/x-upx"
+    },
+    {
+      "hex": "55 50 58 31",
+      "extension": "exe",
+      "description": "UPX packed executable (UPX1)",
+      "mime": "application/x-upx"
+    },
+    {
+      "hex": "55 50 58 32",
+      "extension": "exe",
+      "description": "UPX packed executable (UPX2)",
+      "mime": "application/x-upx"
+    },
+    {
+      "hex": "55 50 58 21",
+      "extension": "exe",
+      "description": "UPX packed executable (UPX!)",
+      "mime": "application/x-upx"
+    },
+    {
+      "hex": "4D 50 52 45 53 53",
+      "extension": "exe",
+      "description": "MPRESS packed executable",
+      "mime": "application/x-mpress"
+    },
+    {
+      "hex": "50 45 43 32",
+      "extension": "exe",
+      "description": "PECompact v2 packed executable",
+      "mime": "application/x-pecompact"
+    },
+    {
+      "hex": "50 45 43 33",
+      "extension": "exe",
+      "description": "PECompact v3 packed executable",
+      "mime": "application/x-pecompact"
+    },
+    {
+      "hex": "41 53 50 61 63 6B",
+      "extension": "exe",
+      "description": "ASPack packed executable",
+      "mime": "application/x-aspack"
+    },
+    {
+      "hex": "46 53 47 21",
+      "extension": "exe",
+      "description": "FSG packed executable",
+      "mime": "application/x-fsg"
+    },
+    {
+      "hex": "74 45 6C 6F 63 6B",
+      "extension": "exe",
+      "description": "tElock protected executable",
+      "mime": "application/x-telock"
+    },
+    {
+      "hex": "41 72 6D 61 64 69 6C 6C 6F",
+      "extension": "exe",
+      "description": "Armadillo protected executable",
+      "mime": "application/x-armadillo"
+    },
+    {
+      "hex": "56 4D 50 72 6F 74 65 63 74",
+      "extension": "exe",
+      "description": "VMProtect protected executable",
+      "mime": "application/x-vmprotect"
+    },
+    {
+      "hex": "45 6E 69 67 6D 61",
+      "extension": "exe",
+      "description": "Enigma protected executable",
+      "mime": "application/x-enigma"
+    },
+    {
+      "hex": "4F 62 73 69 64 69 75 6D",
+      "extension": "exe",
+      "description": "Obsidium protected executable",
+      "mime": "application/x-obsidium"
+    },
+    {
+      "hex": "54 68 65 6D 69 64 61",
+      "extension": "exe",
+      "description": "Themida protected executable",
+      "mime": "application/x-themida"
+    },
+    {
+      "hex": "57 69 6E 4C 69 63 65 6E 73 65",
+      "extension": "exe",
+      "description": "WinLicense protected executable",
+      "mime": "application/x-winlicense"
+    },
+    {
+      "hex": "45 58 45 43 72 79 70 74 6F 72",
+      "extension": "exe",
+      "description": "EXECryptor protected executable",
+      "mime": "application/x-execryptor"
+    },
+    {
+      "hex": "64 6F 74 46 75 73 63 61 74 6F 72",
+      "extension": "dll",
+      "description": "dotFuscator obfuscated .NET assembly",
+      "mime": "application/x-dotfuscator"
+    },
+    {
+      "hex": "43 6F 6E 66 75 73 65 72",
+      "extension": "dll",
+      "description": "Confuser obfuscated .NET assembly",
+      "mime": "application/x-confuser"
+    },
+    {
+      "hex": "53 6D 61 72 74 41 73 73 65 6D 62 6C 79",
+      "extension": "dll",
+      "description": "SmartAssembly obfuscated .NET assembly",
+      "mime": "application/x-smartassembly"
+    },
+    {
+      "hex": "2E 4E 45 54 20 52 65 61 63 74 6F 72",
+      "extension": "dll",
+      "description": ".NET Reactor protected assembly",
+      "mime": "application/x-dotnet-reactor"
+    },
+    {
+      "hex": "42 61 62 65 6C",
+      "extension": "dll",
+      "description": "Babel obfuscated .NET assembly",
+      "mime": "application/x-babel"
+    },
+    {
+      "hex": "6E 73 70 30",
+      "extension": "exe",
+      "description": "NSPack packed executable",
+      "mime": "application/x-nspack"
+    },
+    {
+      "hex": "6E 73 70 31",
+      "extension": "exe",
+      "description": "NSPack v2 packed executable",
+      "mime": "application/x-nspack"
+    },
+    {
+      "hex": "54 45 4C 4F 43 4B",
+      "extension": "exe",
+      "description": "TELOCK protected executable",
+      "mime": "application/x-telock"
+    },
+    {
+      "hex": "53 74 65 61 6C 74 68",
+      "extension": "exe",
+      "description": "Stealth packed executable",
+      "mime": "application/x-stealth"
+    },
+    {
+      "hex": "4D 4F 52 4E 49 4E 47",
+      "extension": "exe",
+      "description": "Morphine packed executable",
+      "mime": "application/x-morphine"
+    },
+    {
+      "hex": "6A 63 61 6C 6C",
+      "extension": "exe",
+      "description": "Jcall packed executable",
+      "mime": "application/x-jcall"
+    },
+    {
+      "hex": "50 45 6E 63 72 79 70 74",
+      "extension": "exe",
+      "description": "PEncrypt packed executable",
+      "mime": "application/x-pencrypt"
+    },
+    {
+      "hex": "44 4E 47 75 61 72 64",
+      "extension": "exe",
+      "description": "DNGuard protected .NET assembly",
+      "mime": "application/x-dnguard"
+    },
+    {
+      "hex": "43 6F 64 65 56 69 72 74 75 61 6C 69 7A 65 72",
+      "extension": "dll",
+      "description": "CodeVirtualizer virtualized assembly",
+      "mime": "application/x-codevirtualizer"
+    },
+    {
+      "hex": "44 65 76 43 72 79 70 74 6F",
+      "extension": "exe",
+      "description": "DevCryptor packed executable",
+      "mime": "application/x-devcrypto"
+    },
+    {
+      "hex": "41 43 45 50 72 6F 74 65 63 74",
+      "extension": "exe",
+      "description": "ACE Protect protected executable",
+      "mime": "application/x-aceprotect"
+    },
+    {
+      "hex": "50 72 6F 74 65 63 74 65 64 20 50 72 6F 70 65 72 74 79",
+      "extension": "exe",
+      "description": "Protected Property (generic protector)",
+      "mime": "application/x-protected-property"
+    },
+    {
+      "hex": "42 69 74 63 6F 69 6E",
+      "extension": "dat",
+      "description": "Bitcoin data",
+      "mime": "application/x-bitcoin"
+    },
+    {
+      "hex": "45 74 68 65 72 65 75 6D",
+      "extension": "dat",
+      "description": "Ethereum data",
+      "mime": "application/x-ethereum"
+    },
+    {
+      "hex": "62 6C 6F 63 6B 63 68 61 69 6E",
+      "extension": "dat",
+      "description": "Blockchain data",
+      "mime": "application/x-blockchain"
+    },
+    {
+      "hex": "42 54 43",
+      "extension": "dat",
+      "description": "Bitcoin (BTC) related data",
+      "mime": "application/x-bitcoin"
+    },
+    {
+      "hex": "4C 49 54 45 43 4F 49 4E",
+      "extension": "dat",
+      "description": "Litecoin data",
+      "mime": "application/x-litecoin"
+    },
+    {
+      "hex": "44 4F 47 45 43 4F 49 4E",
+      "extension": "dat",
+      "description": "Dogecoin data",
+      "mime": "application/x-dogecoin"
+    },
+    {
+      "hex": "5A 43 41 53 48",
+      "extension": "dat",
+      "description": "Zcash data",
+      "mime": "application/x-zcash"
+    },
+    {
+      "hex": "4D 6F 6E 65 72 6F",
+      "extension": "dat",
+      "description": "Monero data",
+      "mime": "application/x-monero"
+    },
+    {
+      "hex": "52 69 70 70 6C 65",
+      "extension": "dat",
+      "description": "Ripple data",
+      "mime": "application/x-ripple"
+    },
+    {
+      "hex": "43 61 72 64 61 6E 6F",
+      "extension": "dat",
+      "description": "Cardano data",
+      "mime": "application/x-cardano"
+    },
+    {
+      "hex": "53 6F 6C 61 6E 61",
+      "extension": "dat",
+      "description": "Solana data",
+      "mime": "application/x-solana"
+    },
+    {
+      "hex": "50 6F 6C 6B 61 64 6F 74",
+      "extension": "dat",
+      "description": "Polkadot data",
+      "mime": "application/x-polkadot"
+    },
+    {
+      "hex": "41 76 61 6C 61 6E 63 68 65",
+      "extension": "dat",
+      "description": "Avalanche data",
+      "mime": "application/x-avalanche"
+    },
+    {
+      "hex": "45 42 58 50 41 52 54",
+      "extension": "mbr",
+      "description": "EFI system partition (ESP)",
+      "mime": "application/x-efi"
+    },
+    {
+      "hex": "47 50 54 50 41 52 54",
+      "extension": "mbr",
+      "description": "GPT protective partition",
+      "mime": "application/x-gpt"
+    },
+    {
+      "hex": "4E 54 46 53 20 20 20 20",
+      "extension": "img",
+      "description": "NTFS volume boot record",
+      "mime": "application/x-ntfs"
+    },
+    {
+      "hex": "45 58 54 34 20 20 20 20",
+      "extension": "img",
+      "description": "ext4 volume",
+      "mime": "application/x-ext4"
+    },
+    {
+      "hex": "45 58 54 33 20 20 20 20",
+      "extension": "img",
+      "description": "ext3 volume",
+      "mime": "application/x-ext3"
+    },
+    {
+      "hex": "45 58 54 32 20 20 20 20",
+      "extension": "img",
+      "description": "ext2 volume",
+      "mime": "application/x-ext2"
+    },
+    {
+      "hex": "48 50 46 53 20 20 20 20",
+      "extension": "img",
+      "description": "HPFS volume",
+      "mime": "application/x-hpfs"
+    },
+    {
+      "hex": "46 41 54 33 32 20 20 20",
+      "extension": "img",
+      "description": "FAT32 volume",
+      "mime": "application/x-fat32"
+    },
+    {
+      "hex": "46 41 54 31 36 20 20 20",
+      "extension": "img",
+      "description": "FAT16 volume",
+      "mime": "application/x-fat16"
+    },
+    {
+      "hex": "46 41 54 31 32 20 20 20",
+      "extension": "img",
+      "description": "FAT12 volume",
+      "mime": "application/x-fat12"
+    },
+    {
+      "hex": "45 66 69 20 70 61 72 74",
+      "extension": "img",
+      "description": "EFI partition",
+      "mime": "application/x-efi"
+    },
+    {
+      "hex": "5A 4D 41 52 43 48 49 56 45",
+      "extension": "zip",
+      "description": "ZIP archive (self-extracting)",
+      "mime": "application/zip"
+    },
+    {
+      "hex": "2E 73 68 61 72 65",
+      "extension": "7z",
+      "description": "7-Zip archive (SFX)",
+      "mime": "application/x-7z-compressed"
+    },
+    {
+      "hex": "57 69 6E 52 41 52",
+      "extension": "rar",
+      "description": "WinRAR SFX archive",
+      "mime": "application/vnd.rar"
+    },
+    {
+      "hex": "53 46 58 4B 47 52 45 45",
+      "extension": "exe",
+      "description": "SFX archive (SFXKGRE)",
+      "mime": "application/octet-stream"
+    },
+    {
+      "hex": "4D 69 63 72 6F 73 6F 66 74 20 43 2F 43 2B 2B 20 4D 53 46 20 37 2E 30 30",
+      "extension": "pdb",
+      "description": "Microsoft C/C++ PDB v7.0",
+      "mime": "application/x-ms-pdb"
+    },
+    {
+      "hex": "4E 42 31 30",
+      "extension": "pdb",
+      "description": "Microsoft PDB (NB10)",
+      "mime": "application/x-ms-pdb"
+    },
+    {
+      "hex": "52 53 44 53",
+      "extension": "pdb",
+      "description": "Microsoft PDB (RSDS)",
+      "mime": "application/x-ms-pdb"
+    },
+    {
+      "hex": "44 57 41 52 46",
+      "extension": "dwarf",
+      "description": "DWARF debug info",
+      "mime": "application/x-dwarf"
+    },
+    {
+      "hex": "3C 3F 78 6D 6C 20 76 65 72 73 69 6F 6E 3D 22 31 2E 30 22 3F 3E",
+      "extension": "xml",
+      "description": "XML declaration header",
+      "mime": "application/xml"
+    },
+    {
+      "hex": "44 6F 63 75 6D 65 6E 74 53 61 76 65 72",
+      "extension": "vsdx",
+      "description": "Microsoft Visio drawing (VSDX)",
+      "mime": "application/vnd.ms-visio.drawing"
+    },
+    {
+      "hex": "41 4E 44 52 4F 49 44 21",
+      "extension": "android",
+      "description": "Android boot image",
+      "mime": "application/x-android-boot"
+    },
+    {
+      "hex": "41 53 43 49 49",
+      "extension": "img",
+      "description": "Android sparse image (ASCiI)",
+      "mime": "application/x-android-sparse"
+    },
+    {
+      "hex": "46 4F 52 4D",
+      "extension": "iff",
+      "description": "IFF container (Interchange File Format)",
+      "mime": "application/x-iff"
+    },
+    {
+      "hex": "43 41 54 20 57 41 52 52 49 4F 52",
+      "extension": "catalog",
+      "description": "Catalog file",
+      "mime": "application/x-catalog"
+    },
+    {
+      "hex": "49 6E 73 74 61 6C 6C 65 72 20 56 32 2E 30",
+      "extension": "msi",
+      "description": "Windows Installer v2.0",
+      "mime": "application/x-msi"
+    },
+    {
+      "hex": "57 69 6E 64 6F 77 73 20 41 70 70 6C 69 63 61 74 69 6F 6E",
+      "extension": "exe",
+      "description": "Windows application file",
+      "mime": "application/x-msdownload"
+    },
+    {
+      "hex": "57 69 6E 64 6F 77 73 20 52 65 67 69 73 74 72 79 20 45 64 69 74 6F 72",
+      "extension": "reg",
+      "description": "Windows Registry Editor file (.reg)",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "50 6F 77 65 72 53 68 65 6C 6C",
+      "extension": "ps1",
+      "description": "PowerShell script",
+      "mime": "text/x-powershell"
+    },
+    {
+      "hex": "43 3A 5C 57 69 6E 64 6F 77 73 5C",
+      "extension": "inf",
+      "description": "Windows INF (C:\\Windows)",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "53 79 73 74 65 6D 48 69 76 65",
+      "extension": "reg",
+      "description": "Windows SYSTEM registry hive (deep)",
+      "mime": "application/x-ms-registry"
+    },
+    {
+      "hex": "53 6F 66 74 77 61 72 65 48 69 76 65",
+      "extension": "reg",
+      "description": "Windows SOFTWARE registry hive (deep)",
+      "mime": "application/x-ms-registry"
+    },
+    {
+      "hex": "53 41 4D 50 45 52",
+      "extension": "db",
+      "description": "Windows Superfetch / SysMain",
+      "mime": "application/x-ms-sysmain"
+    },
+    {
+      "hex": "49 6E 74 65 72 6E 65 74 20 45 78 70 6C 6F 72 65 72",
+      "extension": "url",
+      "description": "Internet Explorer URL shortcut (.url)",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "53 4F 46 54 57 41 52 45 5C 4D 69 63 72 6F 73 6F 66 74",
+      "extension": "reg",
+      "description": "Windows Software\\Microsoft registry key",
+      "mime": "application/x-ms-registry"
+    },
+    {
+      "hex": "57 49 4E 44 4F 57 53 20 42 4F 4F 54 20 53 45 43 54 4F 52",
+      "extension": "mbr",
+      "description": "Windows Master Boot Record",
+      "mime": "application/x-ms-mbr"
+    },
+    {
+      "hex": "72 6F 6F 74 3A 78 3A 30 3A 30",
+      "extension": "passwd",
+      "description": "Linux /etc/passwd entry",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "72 6F 6F 74 3A 24 36 24",
+      "extension": "shadow",
+      "description": "Linux /etc/shadow (hashed root pw)",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "4C 69 6E 75 78 20 76 65 72 73 69 6F 6E",
+      "extension": "log",
+      "description": "Linux kernel version string",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "45 58 54 34 2D 66 69 6C 65 73 79 73 74 65 6D",
+      "extension": "img",
+      "description": "Linux ext4 filesystem (deep)",
+      "mime": "application/x-ext4"
+    },
+    {
+      "hex": "67 72 75 62 2F 67 72 75 62 2E 63 66 67",
+      "extension": "cfg",
+      "description": "Linux GRUB configuration",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "2F 62 69 6E 2F 62 61 73 68",
+      "extension": "sh",
+      "description": "Bash shell script (deep)",
+      "mime": "text/x-shellscript"
+    },
+    {
+      "hex": "2F 75 73 72 2F 62 69 6E 2F 70 79 74 68 6F 6E",
+      "extension": "py",
+      "description": "Python script (deep)",
+      "mime": "text/x-python"
+    },
+    {
+      "hex": "2F 62 69 6E 2F 73 68",
+      "extension": "sh",
+      "description": "Shell script /bin/sh (deep)",
+      "mime": "text/x-shellscript"
+    },
+    {
+      "hex": "69 6E 69 74 72 61 6D 66 73",
+      "extension": "img",
+      "description": "Linux initramfs string marker",
+      "mime": "application/x-initramfs"
+    },
+    {
+      "hex": "63 72 79 70 74 6F 5F 75 6E 61 6D 65",
+      "extension": "img",
+      "description": "Linux LUKS encrypted volume (crypt_o)",
+      "mime": "application/x-luks"
+    },
+    {
+      "hex": "73 65 6C 69 6E 75 78 3A 20 63 6F 6E 74 65 78 74 3D 75",
+      "extension": "sepolicy",
+      "description": "Android SELinux policy context",
+      "mime": "application/x-selinux-policy"
+    },
+    {
+      "hex": "53 45 41 4E 44 52 4F 49 44 20",
+      "extension": "log",
+      "description": "Android logcat (SEANDROID)",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "69 6E 69 74 2E 72 63",
+      "extension": "rc",
+      "description": "Android init.rc script",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "70 65 72 73 69 73 74 2E 70 72 6F 70",
+      "extension": "prop",
+      "description": "Android persist.prop",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "62 75 69 6C 64 2E 70 72 6F 70",
+      "extension": "prop",
+      "description": "Android build.prop",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "64 65 66 61 75 6C 74 2E 70 72 6F 70",
+      "extension": "prop",
+      "description": "Android default.prop",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "73 79 73 74 65 6D 2E 70 72 6F 70",
+      "extension": "prop",
+      "description": "Android system.prop",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "66 61 63 74 6F 72 79 2E 72 63",
+      "extension": "rc",
+      "description": "Android factory.rc",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "75 65 66 69 2E 72 63",
+      "extension": "rc",
+      "description": "Android uefi.rc",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "66 69 72 65 77 61 6C 6C 2E 72 63",
+      "extension": "rc",
+      "description": "Android firewall.rc",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "6C 6F 67 63 61 74 2E 72 63",
+      "extension": "rc",
+      "description": "Android logcat.rc",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "61 70 70 5F 70 72 6F 63 65 73 73",
+      "extension": "prop",
+      "description": "Android app_process configuration",
+      "mime": "text/plain"
+    },
+    {
+      "hex": "72 6F 6F 74 65 64 2E 69 6D 67",
+      "extension": "img",
+      "description": "Android root image",
+      "mime": "application/x-android-image"
+    },
+    {
+      "hex": "75 73 65 72 64 61 74 61 2E 69 6D 67",
+      "extension": "img",
+      "description": "Android userdata image",
+      "mime": "application/x-android-image"
+    },
+    {
+      "hex": "73 79 73 74 65 6D 2E 69 6D 67",
+      "extension": "img",
+      "description": "Android system image",
+      "mime": "application/x-android-image"
+    },
+    {
+      "hex": "76 65 6E 64 6F 72 2E 69 6D 67",
+      "extension": "img",
+      "description": "Android vendor image",
+      "mime": "application/x-android-image"
+    }
+  ]
+}

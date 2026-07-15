@@ -25,6 +25,8 @@ pub struct Format {
 }
 
 pub mod mstar;
+pub mod mstar_unfd;
+pub mod ubi;
 pub mod android_ota_zip;
 pub mod mstar_secure_old;
 pub mod samsung_old;
@@ -87,9 +89,19 @@ pub fn get_registry() -> Vec<Format> {
             extractor_func: crate::formats::android_ota_zip::extract_android_ota_zip,
         },
         Format {
+            name: "mstar_unfd",
+            detector_func: crate::formats::mstar_unfd::is_mstar_unfd_file,
+            extractor_func: crate::formats::mstar_unfd::extract_mstar_unfd,
+        },
+        Format {
             name: "mstar",
             detector_func: crate::formats::mstar::is_mstar_file,
             extractor_func: crate::formats::mstar::extract_mstar,
+        },
+        Format {
+            name: "ubi",
+            detector_func: crate::formats::ubi::is_ubi_file,
+            extractor_func: crate::formats::ubi::extract_ubi,
         },
         Format {
             name: "samsung_old",

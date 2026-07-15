@@ -1,232 +1,183 @@
 # unixtract
-Extractor for various file formats.   
-This project is a fork of [theubusu/unixtract](https://github.com/theubusu/unixtract), adding extra features and improvements.   
-This is a tool that is able to extract the contents of various firmware package formats, mostly from TVs and AV devices.   
-Built in Rust, and made to not depend on any external dependancies, only Rust crates. This way it can work on Windows, Linux and MacOS and even Android.   
-Please note that this project is still under active development and errors may occur. Feel free to make an issue in that case, or if you have any feature request.   
-     
-**PLEASE NOTE** - this program is NOT, and will never be designed for re-packing the extracted files!
 
-## About this fork
-This fork extends the upstream project with additional features and bug fixes. For the original README and format support details, see the [upstream repository](https://github.com/theubusu/unixtract).
+> A fast, dependency-free firmware extractor for TVs, Blu-ray players, set-top boxes, and other AV devices.
 
-# Installation
-You can download the latest auto build for Windows and Linux x86-64 from [here](https://nightly.link/theubusu/unixtract/workflows/rust/main).   
-Or, build from source, by downloading the code or cloning the respository and running `cargo build --release`. The binary will be saved in `target/release`.  
+`unixtract` analyzes and unpacks a wide range of proprietary firmware package formats, with built-in decryption and decompression. It is written entirely in Rust with no external runtime dependencies, so a single binary runs on **Windows, Linux, macOS, and Android**.
 
-# Usage
-`unixtract [OPTIONS] <INPUT_TARGET> [OUTPUT_FOLDER]`  
-Arguments:   
-`<INPUT_TARGET>` - The target to analyze/extract.  
-`[OUTPUT_FOLDER]` - Folder to save extracted files to.  
-If an output folder is not provided, extracted files will be saved in folder `_<INPUT_TARGET>`.  
-Options:  
-`-o, --options <OPTIONS>` - Format specific or global(for all formats that implement it) options, see the list below for format specific options. You can use this multiple times to activate multiple options.    
+This project is a fork of [theubusu/unixtract](https://github.com/theubusu/unixtract), adding extra formats, features, and fixes.
 
-## Global options
-`dump_dec_hdrs` - For formats with an encrypted header - dump the decrypted header(s).    
+> [!NOTE]
+> This project is under active development — errors may occur. Bug reports and feature requests are welcome via the issue tracker.
 
-# Supported formats
-## Amlogic burning image  
-**Used in:** Android TVs and Boxes   
-**Notes:** V1 format is not supported because of the lack of sample file.  
-**Thanks to:** https://github.com/7Ji/ampack
+> [!IMPORTANT]
+> `unixtract` is an **extraction** tool only. It is **not**, and will never be, designed to re-pack extracted files.
 
-## Android OTA payload.bin  
-**Used in:** Android devices, smartphones, TVs   
-**Notes:** Some compression methods may not be supported.  
-**Thanks to:** https://android.googlesource.com/platform/system/update_engine/+/HEAD/update_metadata.proto
+---
 
-## BDL  
-**Used in:** Enterprise HP Printers  
-**Notes:** None, all files should be supported
+## Table of Contents
 
-## CD5  
-**Used in:** Some Samsung TV tuners, and possibly other Irdeto(?)-based tuners  
-**Notes:** Decryption is not supported.
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Supported Formats](#supported-formats)
+- [Format Options](#format-options)
+- [Notes on Keys](#notes-on-keys)
+- [License](#license)
 
-## EPK v1  
-**Used in:** LG TVs before ~2010  
-**Notes:** None, all files should be supported  
-**Thanks to:** https://github.com/openlgtv/epk2extract
+---
 
-## EPK v2  
-**Used in:** LG TVs since ~2010  
-**Notes:** **Depends on keys** - see keys.rs (most common keys should be included)  
-**Thanks to:** https://github.com/openlgtv/epk2extract   
-**Options:**   
-※ Support `dump_dec_hdrs` option
+## Features
 
-## EPK v3  
-**Used in:** LG webOS-based TVs  
-**Notes:** **Depends on keys** - see keys.rs  
-**Thanks to:** https://github.com/openlgtv/epk2extract   
-**Options:**   
-※ Support `dump_dec_hdrs` option
+- **35+ firmware formats** across major TV/AV silicon vendors (MStar, MediaTek, Novatek, Amlogic, Broadcom…).
+- **Built-in decryption** (AES, DES, ECB/CBC, RSA) and **decompression** (LZO, LZ4, LZMA/XZ, zlib/gzip, bzip2, zstd, LZHS, sparse).
+- **Recursive extraction** — container formats automatically unpack their inner payloads.
+- **NAND-aware** — handles raw NAND dumps, OOB/spare stripping, and UBI/UBIFS rootfs images.
+- **Single static binary** — no interpreters, no system libraries.
+- **Bulk mode** — process an entire directory of firmware in one run.
 
-## Funai BDP   
-**Used in:** Funai & Funai-made Philips Blu-Ray player/HTS (USA market)  
-**Notes:** N/A   
+## Installation
 
-## Funai MStar   
-**Used in:** MStar-based Funai & Funai-made Philips TVs (USA market)  
-**Notes:** Inner SoC part is extracted with mstar_secure_old    
+### Prebuilt binaries
 
-## Funai UPG   
-**Used in:** Some Funai TVs  
-**Notes:** **Depends on keys** - see keys.rs.    
+Download the latest automated build for Windows and Linux x86-64 from the [nightly builds](https://nightly.link/Ap0dexMe0/unixtract/workflows/rust/main).
 
-## Funai UPG PHL   
-**Used in:** Funai & Funai-made Philips TVs (USA market)  
-**Notes:** **Depends on keys** - see keys.rs (most common keys should be included).    
+### From source
 
-## GX DVB
-**Used in:** Cheap NationalChip GX-based DVB tuners    
-**Notes:** None, all files should be supported
+```sh
+git clone https://github.com/Ap0dexMe0/unixtract
+cd unixtract
+cargo build --release
+```
 
-## INVINCIBLE_IMAGE   
-**Used in:** LG Broadcom-based Blu-Ray players  
-**Notes:** Key ID 1 (<2010) is not supported.   
-Tip: if you have split ROM (.ROM-00 and .ROM-01), extract both into the same folder so they get combined.       
+The resulting binary is written to `target/release/unixtract`.
 
-## MSD 1.0
-**Used in:** Samsung TVs 2013-2015  
-**Notes:** **Depends on keys** - see keys.rs  
-**Thanks to:** https://github.com/bugficks/msddecrypt  
-**Options:**   
-`msd10:save_cmac` - Save CMAC data for files that is skipped by default.   
-`msd:print_ouith` - Prints the entire parsed OUITH header.  
-※ Support `dump_dec_hdrs` option
+## Usage
 
-## MSD 1.1
-**Used in:** Samsung TVs 2016+  
-**Notes:** **Depends on keys** - see keys.rs (keys 2015-2018, 2020 included)  
-**Thanks to:** https://github.com/bugficks/msddecrypt  
-**Options:**   
-`msd:print_ouith` - Prints the entire parsed OUITH header.  
-※ Support `dump_dec_hdrs` option
+```sh
+unixtract [OPTIONS]
+```
 
-## MStar upgrade bin
-**Used in:** Many MStar-based TVs (Hisense, Toshiba...)  
-**Notes:** All files should be supported, includes lzop, lz4, lzma, sparse_write support  
-**Options:**  
-`mstar:keep_unknown` - Save data with unknown destination.  
-※ Support `dump_dec_hdrs` option (will save the script)   
+### Input modes (mutually exclusive)
 
-## MStar upgrade bin (Secure, old)
-**Used in:** Older MStar-based TVs with Secure upgrade mode (encrypted+signed)  
-**Notes:** Only default upgrade key is supported. This use the extractor above after decrypting.  
-**Options:**  
-`mstar_secure_old:keep_decrypted` - Keep decrypted file (it will be deleted by default).  
+| Flag | Description |
+| --- | --- |
+| `--file-input <FILE>` | Extract a single firmware binary |
+| `--dir-input <DIR>` | Bulk-process every firmware binary in a directory |
 
-## MediaTek BDP
-**Used in:** Many MediaTek-based Blu-Ray players (LG, Samsung, Philips, Panasonic...)  
-**Notes:** Some older files may fail to extract  
+### Options
 
-## MediaTek PKG (New)
-**Used in:** Newer MediaTek-based TVs (TCL, Hisense, Sony, Philips, CVT...)  
-**Notes:** **Depends on keys** - see keys.rs (Keys for Philips and Sony included)  
-**Thanks to:** https://github.com/theubusu/mtkdec   
-**Options:**   
-`mtk_pkg:no_del_comp` - Don't delete LZHS compressed partition file after decompressing.      
-※ Support `dump_dec_hdrs` option
+| Flag | Description |
+| --- | --- |
+| `--output <PATH>` | Output path for extracted data (default: `_<INPUT>`) |
+| `--lazy-run` | Detect/scan only — skip extraction (fast analysis) |
+| `--build-prop` | Extract and display firmware build properties and metadata |
+| `--dump-keys` | Dump the built-in decryption keys |
+| `--list-formats` | List all supported formats and exit |
+| `-v, --verbose` | Increase verbosity (repeat for more detail) |
+| `-h, --help` | Print help information |
+| `-V, --version` | Print version information |
 
-## MediaTek PKG (Old)
-**Used in:** Older MediaTek-based TVs (Philips, Sony, Hisense...)  
-**Notes:** All files should be supported, decryption + decompression   
-**Options:**   
-`mtk_pkg:no_del_comp` - Don't delete LZHS compressed partition file after decompressing.      
-※ Support `dump_dec_hdrs` option
+### Examples
 
-## Novatek PKG (NFWB)
-**Used in:** Some older Novatek-based TVs (LG, Philips)  
-**Notes:** None, all files should be supported.
+```sh
+# Single file
+unixtract --file-input firmware.bin
+unixtract --file-input firmware.bin --output extracted/ --verbose
 
-## Novatek TIMG
-**Used in:** Newer Novatek-based TVs (Philips(TPVision), Hisense, TCL...)  
-**Notes:** None, all files should be supported.   
+# Bulk directory
+unixtract --dir-input firmware_dump/ --output out/
 
-## Onkyo
-**Used in:** Onkyo AVRs and other AV devices  
-**Notes:** Newer files seem to use a different encryption and are not (yet) supported.   
-**Thanks to:** http://divideoverflow.com/2014/04/decrypting-onkyo-firmware-files/   
-**Options:**   
-※ Support `dump_dec_hdrs` option
+# Quick analysis without extracting
+unixtract --file-input firmware.bin --lazy-run
+```
 
-## Panasonic Blu-Ray (PANA_DVD.FRM, PANA_ESD.FRM, PANAEUSB.FRM)
-**Used in:** Panasonic Blu-Ray Players and Recorders  
-**Notes:** **Depends on keys** - see keys.rs (Included keys should work for 99% of players released in and before 2014, and some released in 2018), Note that there is currently an issue with MAIN in some very ancient files not extracting correctly.   
-**Options:**   
-`pana_dvd:split_main` - Automatically split the MAIN module into seperate partitions.   
-※ Support `dump_dec_hdrs` option
+## Supported Formats
 
-## Philips UPG (Autorun.upg, 2SWU3TXV)
-**Used in:** Philips pre-TPVision TVs 200?-2013 and some Sony TVs 
-**Notes:** **Depends on keys** - see keys.rs  
-**Thanks to:** https://github.com/frederic/pflupg-tool   
-**Options:**   
-`pfl_upg:no_extract_inner_upg` - Do not automatically extract inner UPGs. (Warning: this can cause file collisions sometimes!)   
+> Entries marked **keys** depend on decryption keys — see [`keys.rs`](src/keys.rs). Most common keys are bundled.
+> Entries marked **hdrs** support the `dump_dec_hdrs` option.
 
-## Philips BDP   
-**Used in:** Philips MediaTek-based Blu-ray players/Home theatre systems     
-**Notes:** The main partition (ID 0) can be sometimes encrypted, and there is no good way to detect that. So if MTK BDP extraction fails, try running with `philips_bdp:decrypt` option.     
-**Options:**   
-`philips_bdp:decrypt` - Decrypt main partition   
+### TV / SoC firmware
 
-## PUP
-**Used in:** Sony PlayStation 4/5  
-**Notes:** File has to be decrypted.  
-**Thanks to:** https://github.com/Zer0xFF/ps4-pup-unpacker
+| Format | Used in | Notes |
+| --- | --- | --- |
+| **MStar upgrade bin** | Many MStar-based TVs (Hisense, Toshiba…) | LZOP, LZ4, LZMA, sparse-write support · hdrs |
+| **MStar upgrade bin (Secure, old)** | Older MStar TVs with secure (encrypted+signed) upgrades | Default upgrade key only |
+| **MStar UNFD NAND dump** | Raw MStar NAND dumps prefixed with `MSTARSEMIUNFDCIS` (e.g. `TH58NVG2S3HTA00.bin`) | Derives NAND geometry; carves boot banks, `rootfs_ubi.bin`, and `nand_data.bin`; recurses into inner formats; writes `cis_info.txt` |
+| **UBI / UBIFS NAND rootfs** | NAND Linux rootfs images (`UBI#` header), e.g. carved `rootfs_ubi.bin` | Strips interleaved NAND OOB, tolerates vendor header quirks, reconstructs volumes, CRC-validated linear UBIFS scan (LZO/zlib/zstd) |
+| **MediaTek PKG (New)** | Newer MediaTek TVs (TCL, Hisense, Sony, Philips, CVT…) | keys (Philips, Sony) · hdrs |
+| **MediaTek PKG (Old)** | Older MediaTek TVs (Philips, Sony, Hisense…) | Full decrypt + decompress · hdrs |
+| **Novatek PKG (NFWB)** | Older Novatek TVs (LG, Philips) | All files supported |
+| **Novatek TIMG** | Newer Novatek TVs (TPVision, Hisense, TCL…) | All files supported |
+| **Amlogic burning image** | Android TVs and boxes | V1 not supported (no sample) · thanks to [ampack](https://github.com/7Ji/ampack) |
+| **EPK v1** | LG TVs before ~2010 | thanks to [epk2extract](https://github.com/openlgtv/epk2extract) |
+| **EPK v2** | LG TVs since ~2010 | keys · hdrs · thanks to [epk2extract](https://github.com/openlgtv/epk2extract) |
+| **EPK v3** | LG webOS TVs | keys · hdrs · thanks to [epk2extract](https://github.com/openlgtv/epk2extract) |
+| **MSD 1.0** | Samsung TVs 2013–2015 | keys · hdrs · thanks to [msddecrypt](https://github.com/bugficks/msddecrypt) |
+| **MSD 1.1** | Samsung TVs 2016+ | keys (2015–2018, 2020) · hdrs · thanks to [msddecrypt](https://github.com/bugficks/msddecrypt) |
+| **Samsung (`*.img.sec` folder)** | Samsung TVs pre-2013 | keys · thanks to [samygo-patcher](https://github.com/george-hopkins/samygo-patcher) |
+| **Philips UPG** (`Autorun.upg`, `2SWU3TXV`) | Philips pre-TPVision TVs 200?–2013, some Sony TVs | keys · thanks to [pflupg-tool](https://github.com/frederic/pflupg-tool) |
+| **Roku** | Roku TVs / players | Some inner images remain encrypted |
+| **GX DVB** | Cheap NationalChip GX-based DVB tuners | All files supported |
+| **CD5** | Some Samsung TV tuners / Irdeto-based tuners | Decryption not supported |
+| **TSB Bin** | Older Toshiba TVs | hdrs |
 
-## Roku
-**Used in:** Roku TV's/players  
-**Notes:** The contents of the update file can be extracted, but some firmware images contained inside are additionally encrypted, and they cannot be decrypted as of now. 
+### Blu-ray / AV device firmware
 
-## RUF
-**Used in:** Samsung Broadcom-based Blu-Ray players  
-**Notes:** **Depends on keys** - see keys.rs 
+| Format | Used in | Notes |
+| --- | --- | --- |
+| **MediaTek BDP** | MediaTek Blu-ray players (LG, Samsung, Philips, Panasonic…) | Some older files may fail |
+| **Philips BDP** | Philips MediaTek-based Blu-ray players / HTS | Main partition may be encrypted — try `philips_bdp:decrypt` |
+| **Sony BDP** | Sony MediaTek-based Blu-ray players | keys (up to MSB29) · thanks to [s390-firmware](http://malcolmstagg.com/bdp/s390-firmware.html) |
+| **Funai BDP** | Funai / Funai-made Philips Blu-ray & HTS (USA) | — |
+| **Funai MStar** | MStar-based Funai / Philips TVs (USA) | Inner SoC part via `mstar_secure_old` |
+| **Funai UPG** | Some Funai TVs | keys |
+| **Funai UPG PHL** | Funai / Philips TVs (USA) | keys |
+| **Panasonic Blu-ray** (`PANA_DVD/ESD/EUSB.FRM`) | Panasonic Blu-ray players & recorders | keys (≤2014, some 2018) · hdrs |
+| **INVINCIBLE_IMAGE** | LG Broadcom Blu-ray players | Key ID 1 (<2010) unsupported; extract split `.ROM-00/.ROM-01` together |
+| **RUF** | Samsung Broadcom Blu-ray players | keys |
+| **RVP / MVP** | Sharp Blu-ray players / recorders | Older XOR-encrypted types only |
+| **Onkyo** | Onkyo AVRs and AV devices | Newer encryption unsupported · hdrs · thanks to [divideoverflow](http://divideoverflow.com/2014/04/decrypting-onkyo-firmware-files/) |
 
-## RVP/MVP
-**Used in:** Sharp Blu-Ray players/recorders  
-**Notes:** Only the older types of files are supported (XOR-encrypted) 
+### Panasonic TV firmware
 
-## Samsung (Folder with ***.img.sec)
-**Used in:** Samsung TVs pre 2013  
-**Notes:** **Depends on keys** - see keys.rs  
-**Thanks to:** https://github.com/george-hopkins/samygo-patcher
+| Format | Used in | Notes |
+| --- | --- | --- |
+| **SDDL.SEC** | Panasonic TVs | Based on [sddl_dec](https://github.com/theubusu/sddl_dec) |
+| **SDBoot** | Panasonic TVs (SD boot) | Single known sample — support may vary |
+| **SDImage** (`SDImage.bin`) | Some 2010 USA Panasonic TVs | Decryption not yet supported |
 
-## SDBoot
-**Used in:** Panasonic TVs SD boot   
-**Notes:** There is only one known sample, so support may vary.  
-**Base:** https://github.com/theubusu/sddl_dec
+### Generic / other
 
-## SDDL.SEC
-**Used in:** Panasonic TVs  
-**Notes:** None, all files should be supported.
-**Options:**   
-`sddl_sec:save_extra` - Save SDIT.FDI and .TXT files that are not extracted by default.   
-`sddl_sec:split_peaks` - Split PEAKS module into partitions (only on older files). This will also automatically decompress compressed partitions.   
-`sddl_sec:no_decomp_peaks` - Do not automatically decompress partitions when splitting PEAKS with above option.   
-**Base:** https://github.com/theubusu/sddl_dec
+| Format | Used in | Notes |
+| --- | --- | --- |
+| **Android OTA `payload.bin`** | Android devices, phones, TVs | Some compression methods unsupported |
+| **Raw eMMC user area** | eMMC dumps with `0x5840` partition descriptors | Dumps `<partition>.bin` + `partition_map.txt` |
+| **BDL** | Enterprise HP printers | All files supported |
+| **PUP** | Sony PlayStation 4/5 | Requires a decrypted file · thanks to [ps4-pup-unpacker](https://github.com/Zer0xFF/ps4-pup-unpacker) |
+| **SLP** | Samsung Tizen-based NX cameras | All files supported |
 
-## SDImage (SDImage.bin)
-**Used in:** Some 2010 USA Panasonic TVs  
-**Notes:** Decryption is not yet supported.
+## Format Options
 
-## SLP
-**Used in:** Samsung Tizen-based NX series cameras  
-**Notes:** None, all files should be supported. 
+Format-specific options are passed by name. Example: `mstar:keep_unknown`.
 
-## Sony BDP
-**Used in:** Sony MediaTek-based Blu-Ray players  
-**Notes:** **Depends on keys** - see keys.rs (Platforms up to MSB29 are supported)  
-**Thanks to:** http://malcolmstagg.com/bdp/s390-firmware.html  
+| Option | Effect |
+| --- | --- |
+| `mstar:keep_unknown` | Save data with unknown destination |
+| `mstar_secure_old:keep_decrypted` | Keep the decrypted file (deleted by default) |
+| `msd10:save_cmac` | Save CMAC data skipped by default |
+| `msd:print_ouith` | Print the entire parsed OUITH header |
+| `mtk_pkg:no_del_comp` | Keep LZHS compressed partition after decompressing |
+| `pana_dvd:split_main` | Split the MAIN module into separate partitions |
+| `pfl_upg:no_extract_inner_upg` | Do not auto-extract inner UPGs (may avoid collisions) |
+| `philips_bdp:decrypt` | Decrypt the main partition |
+| `sddl_sec:save_extra` | Save `SDIT.FDI` and `.TXT` files skipped by default |
+| `sddl_sec:split_peaks` | Split the PEAKS module into partitions (older files) |
+| `sddl_sec:no_decomp_peaks` | Do not auto-decompress when splitting PEAKS |
 
-## TSB Bin
-**Used in:** Older Toshiba TVs  
-**Notes:** None, all files should be supported.   
-**Options:**   
-※ Support `dump_dec_hdrs` option
+## Notes on Keys
 
-# License
-Licensed under GNU GPL v3.  
+Many formats require decryption keys stored in [`src/keys.rs`](src/keys.rs). The most common publicly known keys are bundled. Use `--dump-keys` to list what is available. If extraction of a key-dependent format fails, the required key may simply not be present.
+
+## License
+
+Licensed under the **GNU General Public License v3.0**.

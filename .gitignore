@@ -7,3 +7,6 @@ dist/
 firmware/
 device/
 dist/
+3rd_party/
+.vscode/
+*.exe

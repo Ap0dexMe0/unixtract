@@ -1,0 +1,12 @@
+# Cross-compilation settings.
+#
+# When building the Windows GNU target from Linux, point Cargo at the
+# mingw-w64 toolchain (install via `apt install gcc-mingw-w64-x86-64`).
+# These settings are ignored on hosts that build natively.
+
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+ar = "x86_64-w64-mingw32-ar"
+
+[target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"

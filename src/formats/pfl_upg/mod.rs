@@ -129,6 +129,9 @@ pub fn extract_pfl_upg(app_ctx: &AppContext, _ctx: Box<dyn Any>) -> Result<(), B
                 output_dir: output_path,
                 options: app_ctx.options.clone(),
                 dry_run: app_ctx.dry_run,
+                lazy_run: app_ctx.lazy_run,
+                build_prop: app_ctx.build_prop,
+                dump_keys: app_ctx.dump_keys,
                 quiet: app_ctx.quiet,
                 verbose: app_ctx.verbose,
             };

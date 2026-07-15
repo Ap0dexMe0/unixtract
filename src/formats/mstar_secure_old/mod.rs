@@ -58,6 +58,9 @@ pub fn extract_mstar_secure_old(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Resu
         output_dir: app_ctx.output_dir.clone(),
         options: app_ctx.options.clone(),
         dry_run: app_ctx.dry_run,
+        lazy_run: app_ctx.lazy_run,
+        build_prop: app_ctx.build_prop,
+        dump_keys: app_ctx.dump_keys,
         quiet: app_ctx.quiet,
         verbose: app_ctx.verbose,
     };

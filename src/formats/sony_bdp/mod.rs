@@ -129,6 +129,9 @@ pub fn extract_sony_bdp(app_ctx: &AppContext, ctx: Box<dyn Any>) -> Result<(), B
             output_dir: mtk_extraction_path,
             options: app_ctx.options.clone(),
             dry_run: app_ctx.dry_run,
+            lazy_run: app_ctx.lazy_run,
+            build_prop: app_ctx.build_prop,
+            dump_keys: app_ctx.dump_keys,
             quiet: app_ctx.quiet,
             verbose: app_ctx.verbose,
         };
